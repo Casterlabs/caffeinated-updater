@@ -10,36 +10,45 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 11
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: 'temurin'
-        cache: maven
-        
-    - name: Build updater and make artifacts.
-      run: bash build.sh
-      
-    - uses: actions/upload-artifact@v3
-      with:
-        name: Casterlabs-Caffeinated-Windows.zip
-        path: caffeinated/dist/artifacts/Windows.zip
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "temurin"
+          cache: maven
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: Casterlabs-Caffeinated-macOS.tar.gz
-        path: caffeinated/dist/artifacts/macOS.tar.gz
+      - name: Compile the updater.
+        run: bash build.sh compile
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: Casterlabs-Caffeinated-Linux.tar.gz
-        path: caffeinated/dist/artifacts/Linux.tar.gz
+      - name: Build the Windows artifact.
+        run: bash build.sh dist-windows
+      - name: Upload the Windows artifact.
+        uses: actions/upload-artifact@v3
+        with:
+          name: Casterlabs-Caffeinated-Windows.zip
+          path: caffeinated/dist/artifacts/Windows.zip
+
+      - name: Build the Linux artifact.
+        run: bash build.sh dist-linux
+      - name: Upload the Linux artifact.
+        uses: actions/upload-artifact@v3
+        with:
+          name: Casterlabs-Caffeinated-Linux.tar.gz
+          path: caffeinated/dist/artifacts/Linux.tar.gz
+
+      - name: Build the macOS artifact.
+        run: bash build.sh dist-macos
+      - name: Upload the macOS artifact.
+        uses: actions/upload-artifact@v3
+        with:
+          name: Casterlabs-Caffeinated-macOS.tar.gz
+          path: caffeinated/dist/artifacts/macOS.tar.gz

@@ -35,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-Windows.zip
-          path: caffeinated/dist/artifacts/Windows.zip
+          path: dist/artifacts/Windows.zip
 
       - name: Build the Linux artifact.
         run: bash build.sh dist-linux
@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-Linux.tar.gz
-          path: caffeinated/dist/artifacts/Linux.tar.gz
+          path: dist/artifacts/Linux.tar.gz
 
       - name: Build the macOS artifact.
         run: bash build.sh dist-macos
@@ -51,4 +51,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-macOS.tar.gz
-          path: caffeinated/dist/artifacts/macOS.tar.gz
+          path: dist/artifacts/macOS.tar.gz

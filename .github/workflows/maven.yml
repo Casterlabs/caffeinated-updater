@@ -31,15 +31,15 @@ jobs:
       
     - uses: actions/upload-artifact@v3
       with:
-        name: Windows-amd64.zip
-        path: caffeinated/dist/artifacts/Windows-amd64.zip
+        name: Casterlabs-Caffeinated-Windows.zip
+        path: caffeinated/dist/artifacts/Windows.zip
 
     - uses: actions/upload-artifact@v3
       with:
-        name: macOS-amd64.zip
-        path: caffeinated/dist/artifacts/macOS-amd64.zip
+        name: Casterlabs-Caffeinated-macOS.tar.gz
+        path: caffeinated/dist/artifacts/macOS.tar.gz
 
     - uses: actions/upload-artifact@v3
       with:
-        name: Linux-amd64.zip
-        path: caffeinated/dist/artifacts/Linux-amd64.zip
+        name: Casterlabs-Caffeinated-Linux.tar.gz
+        path: caffeinated/dist/artifacts/Linux.tar.gz

@@ -48,11 +48,6 @@ Var deleteUserData ; You could just store the HWND in $1 etc if you don't want t
 ; Section - Installer
 
 Function .onInit
-  ; Check to see if already installed (current installer).
-  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" "UninstallString"
-  IfFileExists $R0 +1 +2
-  ExecWait "$R0 /S" ; Uninstall.
-  
   ; Check to see if already installed (old installer).
   ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Casterlabs Caffeinated" "UninstallString"
   IfFileExists $R0 +1 +3

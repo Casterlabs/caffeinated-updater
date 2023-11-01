@@ -22,11 +22,7 @@ public class UpdaterPane extends JPanel {
     private static final long serialVersionUID = -4429924866600191261L;
 
     private static final String[] STREAMERS = {
-            "FallenWolf",
-            "GeenoTV",
-            "Glitch3dPenguin",
-            "sadshepherdgirl",
-            "Fargassier"
+            "template" // TODO Find new streamers
     };
 
     private @Setter @NonNull DialogAnimation currentAnimation = new BlankAnimation();

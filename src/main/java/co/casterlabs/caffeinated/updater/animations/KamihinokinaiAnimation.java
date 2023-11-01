@@ -44,7 +44,7 @@ public class KamihinokinaiAnimation extends DialogAnimation {
             snowflakeData[1] = y;
         }
 
-        this.lanternImage = ImageIO.read(FileUtil.loadResourceAsUrl("animation_assets/floating_lantern.png"));
+        this.lanternImage = ImageIO.read(FileUtil.loadResourceAsUrl("assets/animation/floating_lantern.png"));
 
         AnimationContext
             .getRenderables()

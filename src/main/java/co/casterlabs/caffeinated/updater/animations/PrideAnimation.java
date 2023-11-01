@@ -9,16 +9,16 @@ import co.casterlabs.caffeinated.updater.util.FileUtil;
 import lombok.SneakyThrows;
 
 public class PrideAnimation extends DialogAnimation {
-    private BufferedImage prideImage;
+    private BufferedImage image;
 
     @SneakyThrows
     public PrideAnimation() {
-        this.prideImage = ImageIO.read(FileUtil.loadResourceAsUrl("animation_assets/pride.png"));
+        this.image = ImageIO.read(FileUtil.loadResourceAsUrl("assets/animation/pride.png"));
     }
 
     @Override
     public void paintOnBackground(Graphics2D g2d) {
-        g2d.drawImage(this.prideImage, 0, 0, null);
+        g2d.drawImage(this.image, 0, 0, null);
     }
 
     @Override

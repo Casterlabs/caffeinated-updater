@@ -42,7 +42,7 @@ public class ValentinesAnimation extends DialogAnimation {
             data[1] = y;
         }
 
-        this.image = ImageIO.read(FileUtil.loadResourceAsUrl("animation_assets/heart.png"));
+        this.image = ImageIO.read(FileUtil.loadResourceAsUrl("assets/animation/heart.png"));
 
         AnimationContext
             .getRenderables()

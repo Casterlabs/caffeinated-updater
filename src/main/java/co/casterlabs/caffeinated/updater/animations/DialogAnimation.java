@@ -41,6 +41,16 @@ public abstract class DialogAnimation {
             }
         }
 
+        // Enable the Halloween animation on OCT 31.
+        {
+            boolean isOctober = calendarMonth == Calendar.OCTOBER;
+            boolean isTheThirtyFirst = calendarDate == 31;
+
+            if (isOctober && isTheThirtyFirst) {
+                animation = new HalloweenAnimation();
+            }
+        }
+
         // Enable the Kamihinokinai animation on FEB 10.
         {
             boolean isFeburay = calendarMonth == Calendar.FEBRUARY;

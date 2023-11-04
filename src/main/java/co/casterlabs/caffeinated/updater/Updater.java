@@ -207,8 +207,10 @@ public class Updater {
 
                     // Figure out where the updater's base dir is.
                     String updaterCommandLine = co.casterlabs.commons.platform.Process.tryGetCommandLine(co.casterlabs.commons.platform.Process.getPid()); // "C:\Program Files\Casterlabs Caffeinated\Casterlabs-Caffeinated-Updater.exe"
-                    updaterCommandLine = updaterCommandLine.substring(1); // Chop off the leading quote.
-                    updaterCommandLine = updaterCommandLine.substring(0, updaterCommandLine.indexOf('"')); // Chop off the trailing quote (Safe).
+                    if (updaterCommandLine.startsWith("\"")) {
+                        updaterCommandLine = updaterCommandLine.substring(1); // Chop off the leading quote.
+                        updaterCommandLine = updaterCommandLine.substring(0, updaterCommandLine.indexOf('"')); // Chop off the trailing quote (Safe).
+                    }
 
                     File updaterExecutable = new File(updaterCommandLine);
                     File updaterDirectory = updaterExecutable.getParentFile();

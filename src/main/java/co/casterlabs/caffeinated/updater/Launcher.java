@@ -114,6 +114,11 @@ public class Launcher {
     }
 
     public static void doChecks() throws Exception {
+        if (System.getProperty("caffeinated.donotupdate", "false").equalsIgnoreCase("true")) {
+            dialog.setStatus("Twiddling my thumbs...");
+            Thread.sleep(Long.MAX_VALUE);
+        }
+
         dialog.setStatus("Checking for updates...");
 
         if (Updater.isLauncherOutOfDate()) {

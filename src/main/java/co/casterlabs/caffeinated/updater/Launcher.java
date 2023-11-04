@@ -17,7 +17,6 @@ import co.casterlabs.caffeinated.updater.util.WebUtil;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
 import co.casterlabs.commons.platform.OSFamily;
 import co.casterlabs.commons.platform.Platform;
-import co.casterlabs.rakurai.io.IOUtil;
 import lombok.Getter;
 import lombok.Setter;
 import okhttp3.Request;
@@ -155,7 +154,7 @@ public class Launcher {
             double totalSize = response.body().contentLength();
             int totalRead = 0;
 
-            byte[] buffer = new byte[IOUtil.DEFAULT_BUFFER_SIZE];
+            byte[] buffer = new byte[2048];
             int read = 0;
 
             while ((read = source.read(buffer)) != -1) {

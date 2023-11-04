@@ -7,7 +7,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-import co.casterlabs.rakurai.io.IOUtil;
+import co.casterlabs.commons.io.streams.StreamUtil;
 
 public class FileUtil {
 
@@ -18,13 +18,13 @@ public class FileUtil {
     public static String loadResource(String path) throws IOException {
         InputStream in = FileUtil.class.getClassLoader().getResourceAsStream(path);
 
-        return IOUtil.readInputStreamString(in, StandardCharsets.UTF_8);
+        return StreamUtil.toString(in, StandardCharsets.UTF_8);
     }
 
     public static byte[] loadResourceBytes(String path) throws IOException {
         InputStream in = FileUtil.class.getClassLoader().getResourceAsStream(path);
 
-        return IOUtil.readInputStreamBytes(in);
+        return StreamUtil.toBytes(in);
     }
 
     public static URL loadResourceAsUrl(String path) throws IOException {

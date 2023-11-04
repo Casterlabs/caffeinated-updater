@@ -7,12 +7,10 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import co.casterlabs.rakurai.io.IOUtil;
-
 public class ZipUtil {
 
     public static void unzip(File zip, File dest) throws IOException {
-        byte[] buffer = new byte[IOUtil.DEFAULT_BUFFER_SIZE];
+        byte[] buffer = new byte[2048];
 
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zip))) {
             ZipEntry zipEntry = zis.getNextEntry();

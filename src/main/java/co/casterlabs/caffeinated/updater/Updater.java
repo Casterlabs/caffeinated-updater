@@ -18,7 +18,6 @@ import co.casterlabs.caffeinated.updater.util.ZipUtil;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
 import co.casterlabs.commons.platform.OSDistribution;
 import co.casterlabs.commons.platform.Platform;
-import co.casterlabs.rakurai.io.IOUtil;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import lombok.Getter;
@@ -132,7 +131,7 @@ public class Updater {
                 double totalSize = response.body().contentLength();
                 int totalRead = 0;
 
-                byte[] buffer = new byte[IOUtil.DEFAULT_BUFFER_SIZE];
+                byte[] buffer = new byte[2048];
                 int read = 0;
 
                 while ((read = source.read(buffer)) != -1) {
@@ -207,7 +206,7 @@ public class Updater {
                     // Caffeinated. We use the fat build on macOS.
 
                     // Figure out where the updater's base dir is.
-                    String updaterCommandLine = Platform.tryGetCommandLine(); // "C:\Program Files\Casterlabs Caffeinated\Casterlabs-Caffeinated-Updater.exe"
+                    String updaterCommandLine = co.casterlabs.commons.platform.Process.tryGetCommandLine(co.casterlabs.commons.platform.Process.getPid()); // "C:\Program Files\Casterlabs Caffeinated\Casterlabs-Caffeinated-Updater.exe"
                     updaterCommandLine = updaterCommandLine.substring(1); // Chop off the leading quote.
                     updaterCommandLine = updaterCommandLine.substring(0, updaterCommandLine.indexOf('"')); // Chop off the trailing quote (Safe).
 
@@ -270,7 +269,7 @@ public class Updater {
 //                return;
 //            }
 
-            String updaterCommandLine = Platform.tryGetCommandLine();
+            String updaterCommandLine = co.casterlabs.commons.platform.Process.tryGetCommandLine(co.casterlabs.commons.platform.Process.getPid());
             FastLogger.logStatic("Updater CommandLine: %s", updaterCommandLine);
             expectUpdaterFile.createNewFile();
             Files.writeString(expectUpdaterFile.toPath(), updaterCommandLine);

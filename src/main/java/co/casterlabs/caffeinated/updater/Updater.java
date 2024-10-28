@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ProcessBuilder.Redirect;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 import co.casterlabs.caffeinated.updater.util.FileUtil;
@@ -22,8 +23,6 @@ import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import lombok.Getter;
 import net.harawata.appdirs.AppDirsFactory;
-import okhttp3.Request;
-import okhttp3.Response;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
@@ -40,8 +39,6 @@ public class Updater {
     private static File updateFile = new File(appDirectory, "update.zip");
     private static File buildInfoFile = new File(appDirectory, "current_build_info.json");
     private static File expectUpdaterFile = new File(appDirectory, "expect-updater");
-
-    private static final List<OSDistribution> NO_JRE_DISTS = Arrays.asList(OSDistribution.WINDOWS_NT);
 
     private static @Getter boolean isLauncherOutOfDate = false;
     private static @Getter boolean isPlatformSupported = true;
@@ -73,14 +70,10 @@ public class Updater {
                 break;
         }
 
-        if (NO_JRE_DISTS.contains(Platform.osDistribution)) {
-            REMOTE_ZIP_DOWNLOAD_URL += "-nojre";
-        }
-
         REMOTE_ZIP_DOWNLOAD_URL += ".zip";
 
         try {
-            int remoteLauncherVersion = Integer.parseInt(WebUtil.sendHttpRequest(new Request.Builder().url(LAUNCHER_VERSION_URL)).trim());
+            int remoteLauncherVersion = Integer.parseInt(WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(LAUNCHER_VERSION_URL))).trim());
 
             isLauncherOutOfDate = VERSION < remoteLauncherVersion;
         } catch (Exception e) {
@@ -107,11 +100,11 @@ public class Updater {
             if (!installedChannel.equals(CHANNEL)) return true;
 
             String installedCommit = buildInfo.getString("commit");
-            String remoteCommit = WebUtil.sendHttpRequest(new Request.Builder().url(REMOTE_COMMIT_URL)).trim();
+            String remoteCommit = WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(REMOTE_COMMIT_URL))).trim();
             if (!remoteCommit.equals(installedCommit)) return true;
 
             return false;
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             FastLogger.logException(e);
             return true;
         }
@@ -120,15 +113,17 @@ public class Updater {
     public static void downloadAndInstallUpdate(UpdaterDialog dialog) throws UpdaterException {
         FileUtil.emptyDirectory(appDirectory);
 
-        try (Response response = WebUtil.sendRawHttpRequest(new Request.Builder().url(REMOTE_ZIP_DOWNLOAD_URL))) {
+        try {
+            HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(HttpRequest.newBuilder().uri(URI.create(REMOTE_ZIP_DOWNLOAD_URL)), BodyHandlers.ofInputStream());
+
             // Download zip.
             {
                 dialog.setStatus("Downloading updates...");
 
-                InputStream source = response.body().byteStream();
+                InputStream source = response.body();
                 OutputStream dest = new FileOutputStream(updateFile);
 
-                double totalSize = response.body().contentLength();
+                double totalSize = Long.parseLong(response.headers().firstValue("Content-Length").orElse("0"));
                 int totalRead = 0;
 
                 byte[] buffer = new byte[2048];
@@ -200,29 +195,6 @@ public class Updater {
                     default:
                         break;
                 }
-
-                if (NO_JRE_DISTS.contains(Platform.osDistribution)) {
-                    // Use the updater's built-in JRE instead of needing to ship one with
-                    // Caffeinated. We use the fat build on macOS.
-
-                    // Figure out where the updater's base dir is.
-                    String updaterCommandLine = co.casterlabs.commons.platform.Process.tryGetCommandLine(co.casterlabs.commons.platform.Process.getPid()); // "C:\Program Files\Casterlabs Caffeinated\Casterlabs-Caffeinated-Updater.exe"
-                    if (updaterCommandLine.startsWith("\"")) {
-                        updaterCommandLine = updaterCommandLine.substring(1); // Chop off the leading quote.
-                        updaterCommandLine = updaterCommandLine.substring(0, updaterCommandLine.indexOf('"')); // Chop off the trailing quote (Safe).
-                    }
-
-                    File updaterExecutable = new File(updaterCommandLine);
-                    File updaterDirectory = updaterExecutable.getParentFile();
-
-                    // Read the manifest file for the newly downloaded app.
-                    File manifestFile = new File(appDirectory, "Casterlabs-Caffeinated.json");
-                    JsonObject manifest = Rson.DEFAULT.fromJson(FileUtil.readFile(manifestFile), JsonObject.class);
-
-                    // Update said manifest to utilize the updater's JRE.
-                    manifest.put("jrePath", new File(updaterDirectory, "jre").getAbsolutePath());
-                    Files.write(manifestFile.toPath(), manifest.toString(true).getBytes(StandardCharsets.UTF_8));
-                }
             }
         } catch (Exception e) {
             throw new UpdaterException(UpdaterException.Error.DOWNLOAD_FAILED, "Update failed :(", e);
@@ -231,47 +203,7 @@ public class Updater {
 
     public static void launch(UpdaterDialog dialog) throws UpdaterException {
         try {
-//            if (INLINE_PLATFORMS.contains(Platform.osDistribution)) {
-//                // Here's where the fun starts, we load all the jars and run the in the same
-//                // process 👀
-//
-//                // Change directory to the app dir, otherwise the app will pollute the updater's
-//                // installation directory and the world would melt.
-//                ChangeDir.changeProcessDir(appDirectory);
-//
-//                // Load and parse the manifest.
-//                String manifestContent = FileUtil.readFile(new File(appDirectory, "Casterlabs-Caffeinated.json"))
-//                    .replace("\n", "");
-//
-//                JsonObject manifest = Rson.DEFAULT.fromJson(
-//                    manifestContent,
-//                    JsonObject.class
-//                );
-//
-//                JsonArray classpathDecl = manifest.getArray("classPath");
-//
-//                URL[] classpath = new URL[classpathDecl.size()];
-//                String mainClassName = manifest.getString("mainClass");
-//                String[] args = new String[0];
-//
-//                for (int idx = 0; idx < classpath.length; idx++) {
-//                    classpath[idx] = new File(appDirectory, classpathDecl.getString(idx))
-//                        .toURI()
-//                        .toURL();
-//                }
-//
-//                // Load the app's classpath but keep it separated from the updater's
-//                ClassLoader loader = new URLClassLoader(classpath, ClassLoader.getPlatformClassLoader());
-//                Class<?> mainClass = Class.forName(mainClassName, true, loader);
-//                Method mainMethod = mainClass.getMethod("main", String[].class);
-//
-//                // Hide the updater dialog, invoke the main method, and pray.
-//                dialog.dispose();
-//                mainMethod.invoke(null, (Object) args);
-//                return;
-//            }
-
-            String updaterCommandLine = co.casterlabs.commons.platform.Process.tryGetCommandLine(co.casterlabs.commons.platform.Process.getPid());
+            String updaterCommandLine = co.casterlabs.commons.platform.ProcessUtil.tryGetCommandLine(co.casterlabs.commons.platform.ProcessUtil.getPid());
             FastLogger.logStatic("Updater CommandLine: %s", updaterCommandLine);
             expectUpdaterFile.createNewFile();
             Files.writeString(expectUpdaterFile.toPath(), updaterCommandLine);
@@ -298,10 +230,8 @@ public class Updater {
                 .redirectOutput(Redirect.PIPE)
                 .start();
 
-            Scanner in = new Scanner(proc.getInputStream());
-            boolean hasAlreadyStarted = false;
-
-            try {
+            try (Scanner in = new Scanner(proc.getInputStream())) {
+                boolean hasAlreadyStarted = false;
                 while (true) {
                     String line = in.nextLine();
                     System.out.println(line);

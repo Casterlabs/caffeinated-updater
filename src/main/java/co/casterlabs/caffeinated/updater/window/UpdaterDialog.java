@@ -20,7 +20,6 @@ import javax.swing.JFrame;
 import co.casterlabs.caffeinated.updater.animations.DialogAnimation;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
@@ -31,8 +30,8 @@ public class UpdaterDialog extends JFrame implements Closeable {
     public static final int HEIGHT = 320;
 
     public static final Color TRANSPARENT_COLOR = new Color(0, 0, 0, 0);
-    public static final Color BACKGROUND_COLOR = parseCSSColor("#121212");
-    public static final Color TEXT_COLOR = parseCSSColor("#b5b5b5");
+    public static final Color BACKGROUND_COLOR = new Color(18, 18, 18); // #121212
+    public static final Color TEXT_COLOR = new Color(181, 181, 181); // #b5b5b5
 
     private @Getter UpdaterPane pane;
     private @Getter UpdaterUI ui;
@@ -134,11 +133,6 @@ public class UpdaterDialog extends JFrame implements Closeable {
     @Override
     public void dispose() {
         super.dispose();
-    }
-
-    @SneakyThrows
-    public static Color parseCSSColor(String color) {
-        return xyz.e3ndr.javawebcolor.Color.parseCSSColor(color).toAWTColor();
     }
 
     public void setStatus(String status) {

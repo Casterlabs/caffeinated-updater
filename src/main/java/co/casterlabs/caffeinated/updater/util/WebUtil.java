@@ -3,41 +3,36 @@ package co.casterlabs.caffeinated.updater.util;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.stream.Collectors;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandler;
+import java.net.http.HttpResponse.BodyHandlers;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class WebUtil {
-    private static final OkHttpClient client = new OkHttpClient();
+    private static final HttpClient client = HttpClient.newHttpClient();
 
-    public static Response sendRawHttpRequest(@NonNull Request.Builder builder) throws IOException {
-        Response response = client.newCall(builder.build()).execute();
-
-        return response;
+    public static <T> HttpResponse<T> sendRawHttpRequest(@NonNull HttpRequest.Builder builder, @NonNull BodyHandler<T> handler) throws IOException, InterruptedException {
+        return client.send(builder.build(), handler);
     }
 
-    public static String sendHttpRequest(@NonNull Request.Builder builder) throws IOException {
-        try (Response response = sendRawHttpRequest(builder)) {
-            return response.body().string();
-        }
+    public static String sendHttpRequest(@NonNull HttpRequest.Builder builder) throws IOException, InterruptedException {
+        return sendRawHttpRequest(builder, BodyHandlers.ofString()).body();
     }
 
-    public static byte[] sendHttpRequestBytes(@NonNull Request.Builder builder) throws IOException {
-        try (Response response = sendRawHttpRequest(builder)) {
-            return response.body().bytes();
-        }
+    public static byte[] sendHttpRequestBytes(@NonNull HttpRequest.Builder builder) throws IOException, InterruptedException {
+        return sendRawHttpRequest(builder, BodyHandlers.ofByteArray()).body();
     }
 
-    public static String escapeHtml(@NonNull String str) {
-        return str
-            .codePoints()
-            .mapToObj(c -> c > 127 || "\"'<>&".indexOf(c) != -1 ? "&#" + c + ";" : new String(Character.toChars(c)))
-            .collect(Collectors.joining());
-    }
+//    public static String escapeHtml(@NonNull String str) {
+//        return str
+//            .codePoints()
+//            .mapToObj(c -> c > 127 || "\"'<>&".indexOf(c) != -1 ? "&#" + c + ";" : new String(Character.toChars(c)))
+//            .collect(Collectors.joining());
+//    }
 
     @SneakyThrows
     public static String decodeURIComponent(@NonNull String s) {

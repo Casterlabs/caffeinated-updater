@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
@@ -19,8 +22,6 @@ import co.casterlabs.commons.platform.OSFamily;
 import co.casterlabs.commons.platform.Platform;
 import lombok.Getter;
 import lombok.Setter;
-import okhttp3.Request;
-import okhttp3.Response;
 import xyz.e3ndr.fastloggingframework.FastLogHandler;
 import xyz.e3ndr.fastloggingframework.FastLoggingFramework;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
@@ -85,30 +86,21 @@ public class Launcher {
         dialog.setStatus("");
         dialog.setVisible(true);
 
-        if (InstanceManager.trySummonInstance()) {
-            FastLogger.logStatic("App already running, goodbye!");
-            dialog.close();
-            return;
+        String[] kill;
+        if (Platform.osFamily == OSFamily.WINDOWS) {
+            kill = new String[] {
+                    "taskkill",
+                    "/F",
+                    "/IM",
+                    "Casterlabs-Caffeinated.exe"
+            };
         } else {
-            String[] kill;
-
-            if (Platform.osFamily == OSFamily.WINDOWS) {
-                kill = new String[] {
-                        "taskkill",
-                        "/F",
-                        "/IM",
-                        "Casterlabs-Caffeinated.exe"
-                };
-            } else {
-                kill = new String[] {
-                        "pkill",
-                        "Casterlabs-Caffeinated"
-                };
-            }
-
-            FastLogger.logStatic("App isn't responding (or isn't open), attempting to kill it.");
-            Runtime.getRuntime().exec(kill);
+            kill = new String[] {
+                    "pkill",
+                    "Casterlabs-Caffeinated"
+            };
         }
+        Runtime.getRuntime().exec(kill);
 
         doChecks();
     }
@@ -145,48 +137,48 @@ public class Launcher {
     }
 
     private static void updateUpdaterWindows() throws Exception {
-        try (Response response = WebUtil.sendRawHttpRequest(new Request.Builder().url("https://cdn.casterlabs.co/dist/Caffeinated-Installer.exe"))) {
-            final File tempInstaller = new File(System.getProperty("java.io.tmpdir"), "Caffeinated-Installer.exe");
+        HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(HttpRequest.newBuilder().uri(URI.create("https://cdn.casterlabs.co/dist/Caffeinated-Installer.exe")), BodyHandlers.ofInputStream());
 
-            tempInstaller.delete();
-            tempInstaller.createNewFile();
+        final File tempInstaller = new File(System.getProperty("java.io.tmpdir"), "Caffeinated-Installer.exe");
 
-            dialog.setStatus("Downloading installer...");
+        tempInstaller.delete();
+        tempInstaller.createNewFile();
 
-            InputStream source = response.body().byteStream();
-            OutputStream dest = new FileOutputStream(tempInstaller);
+        dialog.setStatus("Downloading installer...");
 
-            double totalSize = response.body().contentLength();
-            int totalRead = 0;
+        InputStream source = response.body();
+        OutputStream dest = new FileOutputStream(tempInstaller);
 
-            byte[] buffer = new byte[2048];
-            int read = 0;
+        double totalSize = Long.parseLong(response.headers().firstValue("Content-Length").orElse("0"));
+        int totalRead = 0;
 
-            while ((read = source.read(buffer)) != -1) {
-                dest.write(buffer, 0, read);
-                totalRead += read;
+        byte[] buffer = new byte[2048];
+        int read = 0;
 
-                double progress = totalRead / totalSize;
+        while ((read = source.read(buffer)) != -1) {
+            dest.write(buffer, 0, read);
+            totalRead += read;
 
-                dialog.setStatus(String.format("Downloading installer... (%.0f%%)", progress * 100));
-                dialog.setProgress(progress);
-            }
+            double progress = totalRead / totalSize;
 
-            dest.flush();
-
-            source.close();
-            dest.close();
-
-            dialog.setProgress(-1);
-
-            Runtime.getRuntime().exec(new String[] {
-                    "powershell",
-                    "-Command",
-                    "\"Start-Process '" + tempInstaller.getCanonicalPath() + "' -Verb RunAs\""
-            });
-            TimeUnit.SECONDS.sleep(2);
-            System.exit(0);
+            dialog.setStatus(String.format("Downloading installer... (%.0f%%)", progress * 100));
+            dialog.setProgress(progress);
         }
+
+        dest.flush();
+
+        source.close();
+        dest.close();
+
+        dialog.setProgress(-1);
+
+        Runtime.getRuntime().exec(new String[] {
+                "powershell",
+                "-Command",
+                "\"Start-Process '" + tempInstaller.getCanonicalPath() + "' -Verb RunAs\""
+        });
+        TimeUnit.SECONDS.sleep(2);
+        System.exit(0);
     }
 
     private static void checkForUpdates() throws Exception {

@@ -1,4 +1,4 @@
-package co.casterlabs.caffeinated.updater.animations;
+package co.casterlabs.caffeinated.updater.window.animations;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

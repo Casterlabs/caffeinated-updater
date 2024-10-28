@@ -17,8 +17,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
-import co.casterlabs.caffeinated.updater.animations.DialogAnimation;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
+import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
 import lombok.Getter;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 import xyz.e3ndr.fastloggingframework.logging.LogLevel;

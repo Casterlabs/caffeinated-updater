@@ -10,9 +10,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import co.casterlabs.caffeinated.updater.animations.BlankAnimation;
-import co.casterlabs.caffeinated.updater.animations.DialogAnimation;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
+import co.casterlabs.caffeinated.updater.window.animations.BlankAnimation;
+import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

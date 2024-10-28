@@ -8,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import co.casterlabs.caffeinated.updater.animations.DialogAnimation;
+import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
 import lombok.NonNull;
 
 public class UpdaterUI extends JPanel {

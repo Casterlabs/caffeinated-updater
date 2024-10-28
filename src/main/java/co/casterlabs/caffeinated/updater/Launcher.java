@@ -15,9 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.UIManager;
 
-import co.casterlabs.caffeinated.updater.animations.DialogAnimation;
 import co.casterlabs.caffeinated.updater.util.WebUtil;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
+import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
 import co.casterlabs.commons.platform.OSFamily;
 import co.casterlabs.commons.platform.Platform;
 import lombok.Getter;

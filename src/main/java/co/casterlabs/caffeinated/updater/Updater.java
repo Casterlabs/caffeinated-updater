@@ -13,80 +13,54 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
 import java.util.Scanner;
 
+import co.casterlabs.caffeinated.updater.target.Target;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
 import co.casterlabs.caffeinated.updater.util.WebUtil;
-import co.casterlabs.caffeinated.updater.util.ZipUtil;
+import co.casterlabs.caffeinated.updater.util.archive.ArchiveExtractor;
+import co.casterlabs.caffeinated.updater.util.archive.Archives;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
 import co.casterlabs.commons.platform.OSDistribution;
 import co.casterlabs.commons.platform.Platform;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
-import lombok.Getter;
 import net.harawata.appdirs.AppDirsFactory;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
 public class Updater {
-    private static final int VERSION = 30;
-    private static final String CHANNEL = System.getProperty("caffeinated.channel", "stable");
+    public static final int VERSION = 30;
+    public static final String CHANNEL = System.getProperty("caffeinated.channel", "stable");
+    public static final String CHANNEL_URL_BASE = "https://cdn.casterlabs.co/dist/" + CHANNEL;
 
-    private static String REMOTE_ZIP_DOWNLOAD_URL = "https://cdn.casterlabs.co/dist/" + CHANNEL + "/";
-    private static final String REMOTE_COMMIT_URL = "https://cdn.casterlabs.co/dist/" + CHANNEL + "/commit";
     private static final String LAUNCHER_VERSION_URL = "https://cdn.casterlabs.co/dist/updater-version";
+    private static final String REMOTE_COMMIT_URL = CHANNEL_URL_BASE + "/commit";
 
     public static String appDataDirectory = AppDirsFactory.getInstance().getUserDataDir("casterlabs-caffeinated", null, null, true);
-    private static File appDirectory = new File(appDataDirectory, "app");
-    private static File updateFile = new File(appDirectory, "update.zip");
-    private static File buildInfoFile = new File(appDirectory, "current_build_info.json");
-    private static File expectUpdaterFile = new File(appDirectory, "expect-updater");
+    public static File appDirectory = new File(appDataDirectory, "app");
 
-    private static @Getter boolean isLauncherOutOfDate = false;
-    private static @Getter boolean isPlatformSupported = true;
+    public static final Target target = Target.get();
 
-    private static final String launchCommand;
+    public static boolean isLauncherOutOfDate() throws IOException, InterruptedException {
+        int remoteLauncherVersion = Integer.parseInt(WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(LAUNCHER_VERSION_URL))).trim());
+        return VERSION < remoteLauncherVersion;
+    }
+
+    public static boolean isPlatformSupported() {
+        return target != null;
+    }
 
     static {
         appDirectory.mkdirs();
-
-        switch (Platform.osDistribution) {
-            case MACOS:
-                launchCommand = appDirectory + "/Casterlabs-Caffeinated.app/Contents/MacOS/Casterlabs-Caffeinated";
-                REMOTE_ZIP_DOWNLOAD_URL += "macOS-amd64";
-                break;
-
-            case LINUX:
-                launchCommand = appDirectory + "/Casterlabs-Caffeinated";
-                REMOTE_ZIP_DOWNLOAD_URL += "Linux-amd64";
-                break;
-
-            case WINDOWS_NT:
-                launchCommand = appDirectory + "/Casterlabs-Caffeinated.exe";
-                REMOTE_ZIP_DOWNLOAD_URL += "Windows-amd64";
-                break;
-
-            default:
-                launchCommand = null;
-                isPlatformSupported = false;
-                break;
-        }
-
-        REMOTE_ZIP_DOWNLOAD_URL += ".zip";
-
-        try {
-            int remoteLauncherVersion = Integer.parseInt(WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(LAUNCHER_VERSION_URL))).trim());
-
-            isLauncherOutOfDate = VERSION < remoteLauncherVersion;
-        } catch (Exception e) {
-            FastLogger.logException(e);
-        }
     }
 
     public static void borkInstall() {
-        buildInfoFile.delete();
+        new File(appDirectory, "current_build_info.json").delete();
     }
 
     public static boolean needsUpdate() {
         try {
+            File buildInfoFile = new File(appDirectory, "current_build_info.json");
+
             // Check for existence of files.
             if (!buildInfoFile.exists()) {
                 FastLogger.logStatic("Build was not healthy, forcing redownload.");
@@ -113,16 +87,19 @@ public class Updater {
     public static void downloadAndInstallUpdate(UpdaterDialog dialog) throws UpdaterException {
         FileUtil.emptyDirectory(appDirectory);
 
+        File updateFile = new File(appDirectory, target.getDownloadName());
+
         try {
-            HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(HttpRequest.newBuilder().uri(URI.create(REMOTE_ZIP_DOWNLOAD_URL)), BodyHandlers.ofInputStream());
+            HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create(String.format("%s/%s", CHANNEL_URL_BASE, target.getDownloadName()))),
+                BodyHandlers.ofInputStream()
+            );
 
-            // Download zip.
-            {
-                dialog.setStatus("Downloading updates...");
+            // Download archive.
+            dialog.setStatus("Downloading updates...");
 
-                InputStream source = response.body();
-                OutputStream dest = new FileOutputStream(updateFile);
-
+            try (InputStream source = response.body(); OutputStream dest = new FileOutputStream(updateFile)) {
                 double totalSize = Long.parseLong(response.headers().firstValue("Content-Length").orElse("0"));
                 int totalRead = 0;
 
@@ -140,61 +117,39 @@ public class Updater {
                 }
 
                 dest.flush();
-
-                source.close();
-                dest.close();
-
                 dialog.setProgress(-1);
             }
 
-            // Extract zip
+            // Extract archive.
             {
                 dialog.setStatus("Installing updates...");
-                ZipUtil.unzip(updateFile, appDirectory);
+                ArchiveExtractor.extract(Archives.probeFormat(updateFile), updateFile, appDirectory);
 
                 updateFile.delete();
 
-                switch (Platform.osDistribution) {
-                    case LINUX: {
-                        // Make the executable... executable on Linux.
-                        String executable = appDirectory.getAbsolutePath() + "/Casterlabs-Caffeinated";
+                if (Platform.osDistribution == OSDistribution.MACOS) {
+                    // Unquarantine the app on MacOS.
+                    String app = '"' + appDirectory.getAbsolutePath() + "/Casterlabs-Caffeinated.app" + '"';
+                    String command = "xattr -rd com.apple.quarantine " + app + " && chmod -R u+x " + app;
 
-                        new ProcessBuilder()
-                            .command(
-                                "chmod", "+x", executable
-                            )
-                            .inheritIO()
-                            .start()
+                    dialog.setStatus("Waiting for permission...");
+                    FastLogger.logStatic("Trying to unquarantine the app...");
 
-                            // Wait for exit.
-                            .waitFor();
-                        break;
-                    }
+                    new ProcessBuilder()
+                        .command(
+                            "osascript",
+                            "-e",
+                            "do shell script \"" + command.replace("\"", "\\\"") + "\" with prompt \"Casterlabs Caffeinated would like to make changes.\" with administrator privileges"
+                        )
+                        .inheritIO()
+                        .start()
 
-                    case MACOS: {
-                        // Unquarantine the app on MacOS.
-                        String app = '"' + appDirectory.getAbsolutePath() + "/Casterlabs-Caffeinated.app" + '"';
-                        String command = "xattr -rd com.apple.quarantine " + app + " && chmod -R u+x " + app;
-
-                        dialog.setStatus("Waiting for permission...");
-
-                        new ProcessBuilder()
-                            .command(
-                                "osascript",
-                                "-e",
-                                "do shell script \"" + command.replace("\"", "\\\"") + "\" with prompt \"Casterlabs Caffeinated would like to make changes.\" with administrator privileges"
-                            )
-                            .inheritIO()
-                            .start()
-
-                            // Wait for exit.
-                            .waitFor();
-                        break;
-                    }
-
-                    default:
-                        break;
+                        // Wait for exit.
+                        .waitFor();
                 }
+
+                File executable = new File(appDirectory, target.getLaunchCommand());
+                executable.setExecutable(true);
             }
         } catch (Exception e) {
             throw new UpdaterException(UpdaterException.Error.DOWNLOAD_FAILED, "Update failed :(", e);
@@ -205,14 +160,16 @@ public class Updater {
         try {
             String updaterCommandLine = co.casterlabs.commons.platform.ProcessUtil.tryGetCommandLine(co.casterlabs.commons.platform.ProcessUtil.getPid());
             FastLogger.logStatic("Updater CommandLine: %s", updaterCommandLine);
+
+            File expectUpdaterFile = new File(appDirectory, "expect-updater");
             expectUpdaterFile.createNewFile();
             Files.writeString(expectUpdaterFile.toPath(), updaterCommandLine);
 
             ProcessBuilder pb = new ProcessBuilder()
                 .directory(appDirectory)
-                .command(launchCommand, "--started-by-updater");
+                .command(target.getLaunchCommand(), "--started-by-updater");
 
-            // TODO look for the build info file before trusting the process. (kill & let
+            // TODO look for the build_ok file before trusting the process. (kill & let
             // the user know it's dead)
 
             if (Platform.osDistribution == OSDistribution.MACOS) {

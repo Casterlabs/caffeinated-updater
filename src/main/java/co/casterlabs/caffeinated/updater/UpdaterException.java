@@ -15,7 +15,6 @@ public class UpdaterException extends Exception {
     public static enum Error {
         DOWNLOAD_FAILED,
         LAUNCH_FAILED;
-
     }
 
 }

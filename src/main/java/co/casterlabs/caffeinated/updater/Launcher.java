@@ -4,24 +4,17 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.UIManager;
 
-import co.casterlabs.caffeinated.updater.util.WebUtil;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
 import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
 import co.casterlabs.commons.platform.OSFamily;
 import co.casterlabs.commons.platform.Platform;
 import lombok.Getter;
-import lombok.Setter;
 import xyz.e3ndr.fastloggingframework.FastLogHandler;
 import xyz.e3ndr.fastloggingframework.FastLoggingFramework;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
@@ -76,7 +69,6 @@ public class Launcher {
 
     private static @Getter Thread updaterThread;
     private static UpdaterDialog dialog;
-    private static @Setter UpdaterMode mode = UpdaterMode.NORMAL;
 
     public static void main(String[] args) throws Exception {
         updaterThread = Thread.currentThread();
@@ -116,69 +108,20 @@ public class Launcher {
         if (Updater.isLauncherOutOfDate()) {
             TimeUnit.SECONDS.sleep(1);
 
-            // Try to autodownload the installer and run it.
-            if (Platform.osFamily == OSFamily.WINDOWS) {
-                try {
-                    updateUpdaterWindows();
-                    return;
-                } catch (Exception e) {
-                    FastLogger.logStatic("Couldn't automagically update the updater (defaulting to the normal message):\n%s", e);
-                }
+            try {
+                Updater.target.updateUpdater(dialog);
+            } catch (Exception e) {
+                FastLogger.logException(e);
+
+                // TODO display this message better and give a button to download.
+                dialog.setLoading(false);
+                dialog.setStatus("Your launcher is out of date! (Download from casterlabs.co)");
+
+                Desktop.getDesktop().browse(new URI("https://casterlabs.co"));
             }
-
-            // TODO display this message better and give a button to download.
-            dialog.setLoading(false);
-            dialog.setStatus("Your launcher is out of date! (Download from casterlabs.co)");
-
-            Desktop.getDesktop().browse(new URI("https://casterlabs.co"));
         } else {
             checkForUpdates();
         }
-    }
-
-    private static void updateUpdaterWindows() throws Exception {
-        HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(HttpRequest.newBuilder().uri(URI.create("https://cdn.casterlabs.co/dist/Caffeinated-Installer.exe")), BodyHandlers.ofInputStream());
-
-        final File tempInstaller = new File(System.getProperty("java.io.tmpdir"), "Caffeinated-Installer.exe");
-
-        tempInstaller.delete();
-        tempInstaller.createNewFile();
-
-        dialog.setStatus("Downloading installer...");
-
-        InputStream source = response.body();
-        OutputStream dest = new FileOutputStream(tempInstaller);
-
-        double totalSize = Long.parseLong(response.headers().firstValue("Content-Length").orElse("0"));
-        int totalRead = 0;
-
-        byte[] buffer = new byte[2048];
-        int read = 0;
-
-        while ((read = source.read(buffer)) != -1) {
-            dest.write(buffer, 0, read);
-            totalRead += read;
-
-            double progress = totalRead / totalSize;
-
-            dialog.setStatus(String.format("Downloading installer... (%.0f%%)", progress * 100));
-            dialog.setProgress(progress);
-        }
-
-        dest.flush();
-
-        source.close();
-        dest.close();
-
-        dialog.setProgress(-1);
-
-        Runtime.getRuntime().exec(new String[] {
-                "powershell",
-                "-Command",
-                "\"Start-Process '" + tempInstaller.getCanonicalPath() + "' -Verb RunAs\""
-        });
-        TimeUnit.SECONDS.sleep(2);
-        System.exit(0);
     }
 
     private static void checkForUpdates() throws Exception {
@@ -186,7 +129,7 @@ public class Launcher {
             // Artificial delay added in here because it'd be too jarring otherwise.
             // Heh, JARring, haha.
 
-            if (Updater.needsUpdate() || (mode == UpdaterMode.FORCE)) {
+            if (Updater.needsUpdate()) {
                 FastLogger.logStatic("Downloading updates.");
                 Updater.downloadAndInstallUpdate(dialog);
                 dialog.setStatus("Done!");

@@ -88,6 +88,14 @@
 			<version>19.0.0</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<!-- Archives -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.26.0</version>
+			<scope>compile</scope>
+		</dependency>
 
 		<!-- Utilities -->
 		<dependency>

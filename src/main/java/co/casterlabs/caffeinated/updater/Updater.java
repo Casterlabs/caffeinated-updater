@@ -28,7 +28,7 @@ import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
 public class Updater {
-    public static final int VERSION = 30;
+    public static final int VERSION = 31;
     public static final String CHANNEL = System.getProperty("caffeinated.channel", "stable");
     public static final String CHANNEL_URL_BASE = "https://cdn.casterlabs.co/dist/" + CHANNEL;
 

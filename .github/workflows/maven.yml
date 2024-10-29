@@ -26,17 +26,23 @@ jobs:
       - name: 📦 Build the Windows artifact
         run: bash build.sh dist-windows
 
+      - name: 🔨 Create installer
+        uses: joncloud/makensis-action@v4.1
+        with:
+          script-file: "Installer.nsi"
+
       - name: 🆙 Upload the Windows artifact (x86_64)
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-windows-x86_64.zip
           path: dist/artifacts/Casterlabs-Caffeinated-windows-x86_64.zip
       
-      - name: Create installer
-        uses: joncloud/makensis-action@v4.1
+      - name: 🆙 Upload the Windows installer (x86_64)
+        uses: actions/upload-artifact@v3
         with:
-          script-file: "Installer.nsi"
-
+          name: Casterlabs-Caffeinated-Setup.exe
+          path: dist/Casterlabs-Caffeinated-Setup.exe
+      
   build_macos:
     runs-on: ubuntu-latest
     steps:

@@ -6,7 +6,7 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.io.IOException;
 
-import javax.swing.ImageIcon;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
@@ -22,25 +22,31 @@ public class UpdaterPane extends JPanel {
     private static final long serialVersionUID = -4429924866600191261L;
 
     private static final String[] STREAMERS = {
-            "template" // TODO Find new streamers
+            "stallion",
+            "flankthomas",
+            "jcodude",
+            "himichannel",
+            "statice06",
     };
 
-    private @Setter @NonNull DialogAnimation currentAnimation = new BlankAnimation();
+    public static String chosenStreamer = STREAMERS[0]; // Default is required for WindowBuilder.
+    private static Image chosenStreamerImage;
 
-    private String chosenStreamer = STREAMERS[0]; // Default is required for WindowBuilder.
-    private Image chosenStreamerImage;
+    static {
+        try {
+            chosenStreamer = STREAMERS[(int) Math.floor(Math.random() * STREAMERS.length)];
+            chosenStreamerImage = ImageIO.read(FileUtil.loadResourceAsUrl(String.format("assets/streamers/%s.png", chosenStreamer)));
+            FastLogger.logStatic("Chosen Streamer: %s", chosenStreamer);
+        } catch (Exception e) {
+            FastLogger.logException(e);
+        }
+    }
+
+    private @Setter @NonNull DialogAnimation currentAnimation = new BlankAnimation();
 
     private @Getter UpdaterUI ui;
 
     public UpdaterPane(UpdaterDialog dialog, DialogAnimation animation) throws IOException {
-        try {
-            this.chosenStreamer = STREAMERS[(int) Math.floor(Math.random() * STREAMERS.length)];
-            this.chosenStreamerImage = new ImageIcon(FileUtil.loadResourceAsUrl(String.format("assets/streamers/%s.png", this.chosenStreamer))).getImage();
-            FastLogger.logStatic("Chosen Streamer: %s", this.chosenStreamer);
-        } catch (Exception e) {
-            FastLogger.logException(e);
-        }
-
         this.currentAnimation = animation;
 
         SpringLayout layout = new SpringLayout();
@@ -77,9 +83,9 @@ public class UpdaterPane extends JPanel {
         this.currentAnimation.paintOnBackground(g2d);
 
         // Paint the background image if set
-        if (this.chosenStreamerImage != null) {
+        if (chosenStreamerImage != null) {
             // The image is same size as the window.
-            g2d.drawImage(this.chosenStreamerImage, 0, 0, null);
+            g2d.drawImage(chosenStreamerImage, 0, 0, null);
         }
 
         // Paint the animation (over background)

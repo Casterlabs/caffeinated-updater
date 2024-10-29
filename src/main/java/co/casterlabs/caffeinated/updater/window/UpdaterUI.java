@@ -14,6 +14,8 @@ import lombok.NonNull;
 public class UpdaterUI extends JPanel {
     private static final long serialVersionUID = -6590073036152631171L;
 
+    public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
+
     private JLabel statusText;
 
     private LoadingSpinner loadingSpinner;
@@ -35,11 +37,21 @@ public class UpdaterUI extends JPanel {
         statusText = new JLabel();
         layout.putConstraint(SpringLayout.SOUTH, statusText, -32, SpringLayout.SOUTH, this);
         layout.putConstraint(SpringLayout.EAST, statusText, -10, SpringLayout.EAST, this);
-        statusText.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 14));
+        statusText.setFont(FONT);
         statusText.setForeground(UpdaterDialog.TEXT_COLOR);
         statusText.setOpaque(false);
         statusText.setText("Checking for updates...");
         this.add(statusText);
+
+        JLabel streamerText = new JLabel();
+        layout.putConstraint(SpringLayout.SOUTH, streamerText, -9, SpringLayout.SOUTH, this);
+        layout.putConstraint(SpringLayout.EAST, streamerText, -10, SpringLayout.EAST, this);
+        streamerText.setFont(FONT);
+        streamerText.setHorizontalAlignment(JLabel.RIGHT);
+        streamerText.setForeground(UpdaterDialog.TEXT_COLOR);
+        streamerText.setOpaque(false);
+        streamerText.setText("@" + UpdaterPane.chosenStreamer);
+        this.add(streamerText);
 
         loadingSpinner = new LoadingSpinner();
         layout.putConstraint(SpringLayout.NORTH, statusText, 13, SpringLayout.NORTH, loadingSpinner);

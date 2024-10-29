@@ -9,6 +9,6 @@
 .metadata
 
 # Common
-target/
+/target/
 dist/
 *_runtime.*

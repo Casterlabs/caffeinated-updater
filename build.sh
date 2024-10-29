@@ -1,97 +1,62 @@
 #!/bin/bash
 
-JRE_DOWNLOAD_URL__WINDOWS="https://api.adoptium.net/v3/binary/latest/11/ga/windows/x64/jre/hotspot/normal/eclipse?project=jdk"
-JRE_DOWNLOAD_URL__LINUX="https://api.adoptium.net/v3/binary/latest/11/ga/linux/x64/jre/hotspot/normal/eclipse?project=jdk"
-JRE_DOWNLOAD_URL__MACOS="https://api.adoptium.net/v3/binary/latest/11/ga/mac/x64/jre/hotspot/normal/eclipse?project=jdk"
+set -e -o pipefail
+
+APP_ID="co.casterlabs.caffeinated"
+APP_NAME="Casterlabs-Caffeinated"
 MAIN_CLASS="co.casterlabs.caffeinated.updater.Launcher"
 
-# Compile everything
 if [[ $@ == *"compile"* ]]; then
+    echo "------------ Compiling app ------------"
     mvn clean package
+    echo "------------ Finishing compiling app ---------"
 fi
-
-# Reset the dist folder
-rm -rf dist/*
-mkdir -p dist
-mkdir dist/artifacts
 
 if [[ $@ == *"dist-windows"* ]]; then
-    echo "Building for Windows..."
-    mkdir dist/windows
+    echo "------------ Bundling for Windows ------------"
 
-    if [ ! -f windows_runtime.zip ]; then
-        echo "Downloading JRE from ${JRE_DOWNLOAD_URL__WINDOWS}."
-        wget -O windows_runtime.zip $JRE_DOWNLOAD_URL__WINDOWS
-    fi
+    java -jar bundler.jar bundle \
+        --arch x86_64 --os windows \
+        --id $APP_ID --name $APP_NAME --icon icon.png \
+        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
-    java -jar "packr.jar" \
-        --platform windows64 \
-        --jdk windows_runtime.zip \
-        --executable Casterlabs-Caffeinated-Updater \
-        --classpath target/Casterlabs-Caffeinated-Updater.jar \
-        --mainclass $MAIN_CLASS \
-        --vmargs caffeinated.channel=stable \
-        --output dist/windows
-
-    echo "Finished building for Windows."
-
-    cd dist/windows
-    zip -r ../artifacts/Windows.zip *
-    cd - # Return.
-    echo ""
-fi
-
-if [[ $@ == *"dist-linux"* ]]; then
-    echo "Building for Linux..."
-    mkdir dist/linux
-
-    if [ ! -f linux_runtime.tar.gz ]; then
-        echo "Downloading JRE from ${JRE_DOWNLOAD_URL__LINUX}."
-        wget -O linux_runtime.tar.gz $JRE_DOWNLOAD_URL__LINUX
-    fi
-
-    java -jar "packr.jar" \
-        --platform linux64 \
-        --jdk linux_runtime.tar.gz \
-        --executable Casterlabs-Caffeinated-Updater \
-        --classpath target/Casterlabs-Caffeinated-Updater.jar \
-        --mainclass $MAIN_CLASS \
-        --vmargs caffeinated.channel=stable \
-        --output dist/linux
-
-    echo "Finished building for Linux."
-
-    cd dist/linux
-    tar -czvf ../artifacts/Linux.tar.gz *
-    cd - # Return.
-    echo ""
+    echo "------------ Finished bundling for Windows ------------"
 fi
 
 if [[ $@ == *"dist-macos"* ]]; then
-    echo "Building for MacOS..."
-    mkdir dist/macos
-    mkdir dist/macos/Casterlabs-Caffeinated.app
+    echo "------------ Bundling for macOS ------------"
 
-    if [ ! -f macos_runtime.tar.gz ]; then
-        echo "Downloading JRE from ${JRE_DOWNLOAD_URL__MACOS}."
-        wget -O macos_runtime.tar.gz $JRE_DOWNLOAD_URL__MACOS
-    fi
+    java -jar bundler.jar bundle \
+        --arch aarch64 --os macos \
+        --id $APP_ID --name $APP_NAME --icon icon.png \
+        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
-    java -jar "packr.jar" \
-        --platform mac \
-        --jdk macos_runtime.tar.gz \
-        --executable Casterlabs-Caffeinated-Updater \
-        --icon app_icon.icns \
-        --bundle co.casterlabs.caffeinated \
-        --classpath target/Casterlabs-Caffeinated-Updater.jar \
-        --mainclass $MAIN_CLASS \
-        --vmargs caffeinated.channel=stable \
-        --output dist/macos/Casterlabs-Caffeinated.app
+    java -jar bundler.jar bundle \
+        --arch x86_64 --os macos \
+        --id $APP_ID --name $APP_NAME --icon icon.png \
+        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
-    echo "Finished building for MacOS."
-
-    cd dist/macos
-    tar -czvf ../artifacts/macOS.tar.gz *
-    cd - # Return.
-    echo ""
+    echo "------------ Finished bundling for macOS ------------"
 fi
+
+if [[ $@ == *"dist-linux"* ]]; then
+    echo "------------ Bundling for Linux ------------"
+
+    java -jar bundler.jar bundle \
+        --arch aarch64 --os gnulinux \
+        --id $APP_ID --name $APP_NAME --icon icon.png \
+        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+
+    java -jar bundler.jar bundle \
+        --arch arm --os gnulinux \
+        --id $APP_ID --name $APP_NAME --icon icon.png \
+        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+
+    java -jar bundler.jar bundle \
+        --arch x86_64 --os gnulinux \
+        --id $APP_ID --name $APP_NAME --icon icon.png \
+        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+
+    echo "------------ Finished bundling for Linux ------------"
+fi
+

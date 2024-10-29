@@ -5,9 +5,9 @@
 
 ;Name and file
 !define COMPANY "Casterlabs"
-!define NAME "Casterlabs Caffeinated"
+!define NAME "Casterlabs-Caffeinated"
 Name "${NAME}"
-OutFile "dist/Casterlabs Caffeinated Setup.exe"
+OutFile "dist/Casterlabs-Caffeinated-Setup.exe"
 Unicode True
 
 ;Default installation folder
@@ -49,9 +49,9 @@ Var deleteUserData ; You could just store the HWND in $1 etc if you don't want t
 
 Function .onInit
   ; Check to see if already installed (old installer).
-  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Casterlabs Caffeinated" "UninstallString"
+  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" "UninstallString"
   IfFileExists $R0 +1 +3
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Casterlabs Caffeinated" ; Forcibly remove the old version.
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" ; Forcibly remove the old version.
   RMDir /r "$INSTDIR"
 FunctionEnd
 
@@ -59,12 +59,12 @@ Section "App"
   SectionIn RO
   
   SetOutPath "$INSTDIR"
-  File /r "dist\windows\*.*" 
+  File /r "dist\build\windows-x86_64\*.*" 
   
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" \
-                 "DisplayName" "Casterlabs Caffeinated"
+                 "DisplayName" "${NAME}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" \
                  "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" \

@@ -42,4 +42,12 @@ public class LinuxTarget implements Target {
         return new File("/Casterlabs-Caffeinated");
     }
 
+    @Override
+    public void kill(String processName) throws InterruptedException, IOException {
+        Runtime.getRuntime().exec(new String[] {
+                "pkill",
+                processName
+        }).waitFor();
+    }
+
 }

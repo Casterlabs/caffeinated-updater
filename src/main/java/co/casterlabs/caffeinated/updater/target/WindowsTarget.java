@@ -88,4 +88,14 @@ public class WindowsTarget implements Target {
         return new File("Casterlabs-Caffeinated.exe");
     }
 
+    @Override
+    public void kill(String processName) throws InterruptedException, IOException {
+        Runtime.getRuntime().exec(new String[] {
+                "taskkill",
+                "/F",
+                "/IM",
+                processName + ".exe"
+        }).waitFor();
+    }
+
 }

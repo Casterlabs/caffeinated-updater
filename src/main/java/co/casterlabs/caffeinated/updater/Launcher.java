@@ -12,8 +12,6 @@ import javax.swing.UIManager;
 
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
 import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
-import co.casterlabs.commons.platform.OSFamily;
-import co.casterlabs.commons.platform.Platform;
 import lombok.Getter;
 import xyz.e3ndr.fastloggingframework.FastLogHandler;
 import xyz.e3ndr.fastloggingframework.FastLoggingFramework;
@@ -78,21 +76,7 @@ public class Launcher {
         dialog.setStatus("");
         dialog.setVisible(true);
 
-        String[] kill;
-        if (Platform.osFamily == OSFamily.WINDOWS) {
-            kill = new String[] {
-                    "taskkill",
-                    "/F",
-                    "/IM",
-                    "Casterlabs-Caffeinated.exe"
-            };
-        } else {
-            kill = new String[] {
-                    "pkill",
-                    "Casterlabs-Caffeinated"
-            };
-        }
-        Runtime.getRuntime().exec(kill);
+        Updater.target.kill("Casterlabs-Caffeinated");
 
         doChecks();
     }

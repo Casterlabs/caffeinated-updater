@@ -42,4 +42,13 @@ public class MacTarget implements Target {
         return new File("../MacOS/Casterlabs-Caffeinated");
     }
 
+    @Override
+    public void kill(String processName) throws InterruptedException, IOException {
+        Runtime.getRuntime().exec(new String[] {
+                "/bin/sh",
+                "-c",
+                "kill $(ps aux | grep " + processName + " | grep -v grep | awk '{print $2}')"
+        }).waitFor();
+    }
+
 }

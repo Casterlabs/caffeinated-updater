@@ -23,7 +23,7 @@ public interface Target {
 
     public File getUpdaterLaunchFile();
 
-    public void kill(String processName) throws InterruptedException, IOException;
+    public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException;
 
     public static Target get() {
         List<Target> targets = Arrays.asList(new LinuxTarget(), new MacTarget(), new WindowsTarget());

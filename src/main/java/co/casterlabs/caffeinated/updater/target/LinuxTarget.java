@@ -43,11 +43,9 @@ public class LinuxTarget implements Target {
     }
 
     @Override
-    public void kill(String processName) throws InterruptedException, IOException {
-        Runtime.getRuntime().exec(new String[] {
-                "pkill",
-                processName
-        }).waitFor();
+    public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException {
+        new File(appDirectory, "Casterlabs-Caffeinated").setExecutable(true);
+        new File(appDirectory, "runtime/bin/java").setExecutable(true);
     }
 
 }

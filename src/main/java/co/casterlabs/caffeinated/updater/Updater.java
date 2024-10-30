@@ -17,8 +17,6 @@ import co.casterlabs.caffeinated.updater.util.WebUtil;
 import co.casterlabs.caffeinated.updater.util.archive.ArchiveExtractor;
 import co.casterlabs.caffeinated.updater.util.archive.Archives;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
-import co.casterlabs.commons.platform.OSDistribution;
-import co.casterlabs.commons.platform.Platform;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import net.harawata.appdirs.AppDirsFactory;
@@ -35,6 +33,7 @@ public class Updater {
 
     public static String appDataDirectory = AppDirsFactory.getInstance().getUserDataDir("casterlabs-caffeinated", null, null, true);
     public static File appDirectory = new File(appDataDirectory, "app");
+    public static File ipcDirectory = new File(appDataDirectory, "ipc");
 
     public static final Target target = Target.get();
 
@@ -125,29 +124,7 @@ public class Updater {
 
                 updateFile.delete();
 
-                if (Platform.osDistribution == OSDistribution.MACOS) {
-                    // Unquarantine the app on MacOS.
-                    String app = '"' + appDirectory.getAbsolutePath() + "/Casterlabs-Caffeinated.app" + '"';
-                    String command = "xattr -rd com.apple.quarantine " + app + " && chmod -R u+x " + app;
-
-                    dialog.setStatus("Waiting for permission...");
-                    FastLogger.logStatic("Trying to unquarantine the app...");
-
-                    new ProcessBuilder()
-                        .command(
-                            "osascript",
-                            "-e",
-                            "do shell script \"" + command.replace("\"", "\\\"") + "\" with prompt \"Casterlabs Caffeinated would like to make changes.\" with administrator privileges"
-                        )
-                        .inheritIO()
-                        .start()
-
-                        // Wait for exit.
-                        .waitFor();
-                }
-
-                File executable = new File(appDirectory, target.getLaunchCommand());
-                executable.setExecutable(true);
+                target.finalizeUpdate(dialog, appDirectory);
             }
         } catch (Exception e) {
             throw new UpdaterException(UpdaterException.Error.DOWNLOAD_FAILED, "Update failed :(", e);

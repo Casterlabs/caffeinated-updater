@@ -9,6 +9,7 @@ import co.casterlabs.caffeinated.updater.Updater;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
 import co.casterlabs.commons.platform.OSDistribution;
 import co.casterlabs.commons.platform.Platform;
+import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
 public class MacTarget implements Target {
 
@@ -43,12 +44,28 @@ public class MacTarget implements Target {
     }
 
     @Override
-    public void kill(String processName) throws InterruptedException, IOException {
-        Runtime.getRuntime().exec(new String[] {
-                "/bin/sh",
-                "-c",
-                "kill $(ps aux | grep " + processName + " | grep -v grep | awk '{print $2}')"
-        }).waitFor();
+    public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException {
+        if (Platform.osDistribution == OSDistribution.MACOS) {
+            // Unquarantine the app on MacOS.
+            String app = '"' + new File(appDirectory, "Casterlabs-Caffeinated.app").getAbsolutePath() + '"';
+            String command = "xattr -rd com.apple.quarantine " + app;
+
+            dialog.setStatus("Waiting for permission...");
+            FastLogger.logStatic("Trying to unquarantine the app...");
+
+            new ProcessBuilder()
+                .command(
+                    "osascript",
+                    "-e",
+                    "do shell script \"" + command.replace("\"", "\\\"") + "\" with prompt \"Casterlabs Caffeinated would like to make changes.\" with administrator privileges"
+                )
+                .inheritIO()
+                .start()
+                .waitFor();
+        }
+
+        new File(appDirectory, "Casterlabs-Caffeinated.app/Contents/MacOS/Casterlabs-Caffeinated").setExecutable(true);
+        new File(appDirectory, "Casterlabs-Caffeinated.app/Contents/Resources/runtime/bin/java").setExecutable(true);
     }
 
 }

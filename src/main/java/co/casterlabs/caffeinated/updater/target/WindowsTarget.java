@@ -85,17 +85,12 @@ public class WindowsTarget implements Target {
 
     @Override
     public File getUpdaterLaunchFile() {
-        return new File("Casterlabs-Caffeinated.exe");
+        return new File("./Casterlabs-Caffeinated.exe");
     }
 
     @Override
-    public void kill(String processName) throws InterruptedException, IOException {
-        Runtime.getRuntime().exec(new String[] {
-                "taskkill",
-                "/F",
-                "/IM",
-                processName + ".exe"
-        }).waitFor();
+    public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException {
+        // NOOP
     }
 
 }

@@ -76,7 +76,11 @@ public class Launcher {
         dialog.setStatus("");
         dialog.setVisible(true);
 
-        Updater.target.kill("Casterlabs-Caffeinated");
+        // Trigger the file watcher(s).
+        File dieFile = new File(Updater.ipcDirectory, "die");
+        dieFile.createNewFile();
+        Thread.sleep(1500);
+        dieFile.delete();
 
         doChecks();
     }

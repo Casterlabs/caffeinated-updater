@@ -39,7 +39,7 @@ public class LinuxTarget implements Target {
 
     @Override
     public File getUpdaterLaunchFile() {
-        return new File("/Casterlabs-Caffeinated");
+        return new File("./Casterlabs-Caffeinated");
     }
 
     @Override

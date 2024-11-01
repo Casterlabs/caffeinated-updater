@@ -129,13 +129,9 @@ Section "Uninstall"
   ${EndIf}
   
   RMDir /r "$APPDATA\casterlabs-caffeinated\app" ; App
-  ${RMDirUP} "$APPDATA\casterlabs-caffeinated\app"
   RMDir /r "$APPDATA\casterlabs-caffeinated\ipc" ; IPC
-  ${RMDirUP} "$APPDATA\casterlabs-caffeinated\ipc"
   RMDir /r "$APPDATA\casterlabs-caffeinated\api" ; API
-  ${RMDirUP} "$APPDATA\casterlabs-caffeinated\api"
   RMDir /r "$APPDATA\casterlabs-caffeinated\logs" ; Logs
-  ${RMDirUP} "$APPDATA\casterlabs-caffeinated\logs"
   
   Delete "$INSTDIR\Uninstall.exe"
 

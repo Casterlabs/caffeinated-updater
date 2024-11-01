@@ -75,13 +75,13 @@ SectionEnd
 
 Section "Desktop Shortcut" DeskShort
   IfSilent +2 ; Don't create Desktop shortcut when silent.
-  CreateShortCut "$DESKTOP\${NAME}.lnk" "$INSTDIR\Casterlabs-Caffeinated-Updater.exe"
+  CreateShortCut "$DESKTOP\${NAME}.lnk" "$INSTDIR\Casterlabs-Caffeinated.exe"
 SectionEnd
 
 Section "Start Menu Shortcut" StartShort
   IfSilent +4 ; Don't create StartMenu shortcut when silent.
   CreateDirectory "$SMPROGRAMS\${COMPANY}"
-  CreateShortCut "$SMPROGRAMS\${COMPANY}\${NAME}.lnk" "$INSTDIR\Casterlabs-Caffeinated-Updater.exe"
+  CreateShortCut "$SMPROGRAMS\${COMPANY}\${NAME}.lnk" "$INSTDIR\Casterlabs-Caffeinated.exe"
   CreateShortCut "$SMPROGRAMS\${COMPANY}\Uninstall ${NAME}.lnk" "$INSTDIR\uninstall.exe"
 SectionEnd
 

@@ -35,6 +35,11 @@ public class Updater {
     public static File appDirectory = new File(appDataDirectory, "app");
     public static File ipcDirectory = new File(appDataDirectory, "ipc");
 
+    static {
+        appDirectory.mkdirs();
+        ipcDirectory.mkdirs();
+    }
+
     public static final Target target = Target.get();
 
     public static boolean isLauncherOutOfDate() throws IOException, InterruptedException {

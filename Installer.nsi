@@ -121,7 +121,7 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}"
 
   ${NSD_GetState} $deleteUserData $0
-  ${If} $0 <> 1
+  ${If} $0 <> 0
     RMDir /r "$APPDATA\casterlabs-caffeinated\preferences" ; Preferences
     ${RMDirUP} "$APPDATA\casterlabs-caffeinated\preferences"
     RMDir /r "$APPDATA\casterlabs-caffeinated\plugins" ; Plugins

@@ -89,9 +89,9 @@ SectionEnd
 ; Section - Uninstaller
 
 Function un.ModifyUnWelcome
-  ${NSD_CreateCheckbox} 120u -20u 50% 20u $(DESC_DeleteUserData)
-  Pop $deleteUserData
-  SetCtlColors $deleteUserData "" ${MUI_BGCOLOR}
+  ;${NSD_CreateCheckbox} 120u -20u 50% 20u $(DESC_DeleteUserData)
+  ;Pop $deleteUserData
+  ;SetCtlColors $deleteUserData "" ${MUI_BGCOLOR}
   ;${NSD_Check} $deleteUserData ; Unchecked by default
 FunctionEnd
 
@@ -120,13 +120,13 @@ FunctionEnd
 Section "Uninstall"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}"
 
-  ${NSD_GetState} $deleteUserData $0
-  ${If} $0 <> 0
-    RMDir /r "$APPDATA\casterlabs-caffeinated\preferences" ; Preferences
-    ${RMDirUP} "$APPDATA\casterlabs-caffeinated\preferences"
-    RMDir /r "$APPDATA\casterlabs-caffeinated\plugins" ; Plugins
-    ${RMDirUP} "$APPDATA\casterlabs-caffeinated\plugins"
-  ${EndIf}
+  ;${NSD_GetState} $deleteUserData $0
+  ;${If} $0 <> 0
+  ;  RMDir /r "$APPDATA\casterlabs-caffeinated\preferences" ; Preferences
+  ;  ${RMDirUP} "$APPDATA\casterlabs-caffeinated\preferences"
+  ;  RMDir /r "$APPDATA\casterlabs-caffeinated\plugins" ; Plugins
+  ;  ${RMDirUP} "$APPDATA\casterlabs-caffeinated\plugins"
+  ;${EndIf}
   
   RMDir /r "$APPDATA\casterlabs-caffeinated\app" ; App
   RMDir /r "$APPDATA\casterlabs-caffeinated\ipc" ; IPC

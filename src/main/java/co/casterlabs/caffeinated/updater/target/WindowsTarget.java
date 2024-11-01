@@ -32,7 +32,7 @@ public class WindowsTarget implements Target {
 
     @Override
     public String getDownloadName() {
-        return "Windows-x86_64.zip";
+        return "Casterlabs-Caffeinated-windows-x86_64.zip";
     }
 
     @Override

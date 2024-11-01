@@ -25,7 +25,7 @@ public class MacTarget implements Target {
 
     @Override
     public String getDownloadName() {
-        return String.format("macOS-%s.tar.gz", Platform.archTarget);
+        return String.format("Casterlabs-Caffeinated-macos-%s.tar.gz", Platform.archTarget);
     }
 
     @Override
@@ -45,27 +45,22 @@ public class MacTarget implements Target {
 
     @Override
     public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException {
-        if (Platform.osDistribution == OSDistribution.MACOS) {
-            // Unquarantine the app on MacOS.
-            String app = '"' + new File(appDirectory, "Casterlabs-Caffeinated.app").getAbsolutePath() + '"';
-            String command = "xattr -rd com.apple.quarantine " + app;
+        // Unquarantine the app on MacOS.
+        String app = '"' + new File(appDirectory, "Casterlabs-Caffeinated.app").getAbsolutePath() + '"';
+        String command = "xattr -rd com.apple.quarantine " + app;
 
-            dialog.setStatus("Waiting for permission...");
-            FastLogger.logStatic("Trying to unquarantine the app...");
+        dialog.setStatus("Waiting for permission...");
+        FastLogger.logStatic("Trying to unquarantine the app...");
 
-            new ProcessBuilder()
-                .command(
-                    "osascript",
-                    "-e",
-                    "do shell script \"" + command.replace("\"", "\\\"") + "\" with prompt \"Casterlabs Caffeinated would like to make changes.\" with administrator privileges"
-                )
-                .inheritIO()
-                .start()
-                .waitFor();
-        }
-
-        new File(appDirectory, "Casterlabs-Caffeinated.app/Contents/MacOS/Casterlabs-Caffeinated").setExecutable(true);
-        new File(appDirectory, "Casterlabs-Caffeinated.app/Contents/Resources/runtime/bin/java").setExecutable(true);
+        new ProcessBuilder()
+            .command(
+                "osascript",
+                "-e",
+                "do shell script \"" + command.replace("\"", "\\\"") + "\" with prompt \"Casterlabs Caffeinated would like to make changes.\" with administrator privileges"
+            )
+            .inheritIO()
+            .start()
+            .waitFor();
     }
 
 }

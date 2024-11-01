@@ -24,7 +24,7 @@ public class LinuxTarget implements Target {
 
     @Override
     public String getDownloadName() {
-        return String.format("Linux-%s.tar.gz", Platform.archTarget);
+        return String.format("Casterlabs-Caffeinated-gnulinux-%s.tar.gz", Platform.archTarget);
     }
 
     @Override
@@ -44,8 +44,7 @@ public class LinuxTarget implements Target {
 
     @Override
     public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException {
-        new File(appDirectory, "Casterlabs-Caffeinated").setExecutable(true);
-        new File(appDirectory, "runtime/bin/java").setExecutable(true);
+        // NOOP
     }
 
 }

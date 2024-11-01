@@ -5,7 +5,7 @@
 
 ;Name and file
 !define COMPANY "Casterlabs"
-!define NAME "Casterlabs-Caffeinated"
+!define NAME "Casterlabs Caffeinated"
 Name "${NAME}"
 OutFile "dist/Casterlabs-Caffeinated-Setup.exe"
 Unicode True

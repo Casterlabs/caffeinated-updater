@@ -131,51 +131,32 @@ public class Updater {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static void launch(UpdaterDialog dialog) throws UpdaterException {
         try {
             String updaterCommandLine = target.getUpdaterLaunchFile().getAbsolutePath();
+            String appCommandLine = new File(target.getResourcesDirectory(), "runtime/bin/java").getAbsolutePath();
+
+            appCommandLine += " ";
+            appCommandLine += Files.readString(new File(appDirectory, "vmargs.txt").toPath());
+            appCommandLine += " --started-by-updater";
+
             FastLogger.logStatic("Updater CommandLine: %s", updaterCommandLine);
+            FastLogger.logStatic("App CommandLine: %s", appCommandLine);
 
             File expectUpdaterFile = new File(appDirectory, "expect-updater");
             expectUpdaterFile.createNewFile();
             Files.writeString(expectUpdaterFile.toPath(), updaterCommandLine);
 
-            ProcessBuilder pb = new ProcessBuilder()
-                .directory(appDirectory)
-                .command(target.getLaunchCommand(), "--started-by-updater");
+            Runtime.getRuntime().exec(appCommandLine, null, appDirectory);
 
             // TODO look for the build_ok file before trusting the process. (kill & let
             // the user know it's dead)
 
-//            if (Platform.osDistribution == OSDistribution.MACOS) {
-            // On MacOS we do not want to keep the updater process open as it'll stick in
-            // the dock. So we start the process and kill the updater to make sure that
-            // doesn't happen.
             FastLogger.logStatic(LogLevel.INFO, "The process will now exit, this is so the updater's icon doesn't stick in the dock.");
-            pb.start();
             dialog.close();
             System.exit(0);
             return;
-//            }
-
-//            Process proc = pb
-//                .redirectOutput(Redirect.PIPE)
-//                .start();
-//
-//            try (Scanner in = new Scanner(proc.getInputStream())) {
-//                boolean hasAlreadyStarted = false;
-//                while (true) {
-//                    String line = in.nextLine();
-//                    System.out.println(line);
-//
-//                    if (!hasAlreadyStarted && line.contains("Starting the UI")) {
-//                        // Look for "Starting the UI" before we close the dialog.
-//                        FastLogger.logStatic(LogLevel.INFO, "UI Started!");
-//                        dialog.close();
-//                        System.exit(0);
-//                    }
-//                }
-//            } catch (Exception ignored) {}
         } catch (Exception e) {
             throw new UpdaterException(UpdaterException.Error.LAUNCH_FAILED, "Could not launch update :(", e);
         }

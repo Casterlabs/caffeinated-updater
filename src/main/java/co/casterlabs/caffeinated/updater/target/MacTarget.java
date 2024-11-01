@@ -29,11 +29,6 @@ public class MacTarget implements Target {
     }
 
     @Override
-    public String getLaunchCommand() {
-        return Updater.appDirectory + "/Casterlabs-Caffeinated.app/Contents/MacOS/Casterlabs-Caffeinated";
-    }
-
-    @Override
     public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException {
         throw new UnsupportedOperationException();
     }
@@ -61,6 +56,11 @@ public class MacTarget implements Target {
             .inheritIO()
             .start()
             .waitFor();
+    }
+
+    @Override
+    public File getResourcesDirectory() {
+        return new File(Updater.appDirectory, "Casterlabs-Caffeinated.app/Contents/Resources");
     }
 
 }

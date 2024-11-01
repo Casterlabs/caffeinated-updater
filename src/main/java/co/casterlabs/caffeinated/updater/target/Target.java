@@ -17,13 +17,13 @@ public interface Target {
 
     public String getDownloadName();
 
-    public String getLaunchCommand();
-
     public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException;
 
     public File getUpdaterLaunchFile();
 
     public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException;
+
+    public File getResourcesDirectory();
 
     public static Target get() {
         List<Target> targets = Arrays.asList(new LinuxTarget(), new MacTarget(), new WindowsTarget());

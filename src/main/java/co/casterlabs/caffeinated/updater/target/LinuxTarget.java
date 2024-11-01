@@ -28,11 +28,6 @@ public class LinuxTarget implements Target {
     }
 
     @Override
-    public String getLaunchCommand() {
-        return Updater.appDirectory + "/Casterlabs-Caffeinated";
-    }
-
-    @Override
     public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException {
         throw new UnsupportedOperationException();
     }
@@ -45,6 +40,11 @@ public class LinuxTarget implements Target {
     @Override
     public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException {
         // NOOP
+    }
+
+    @Override
+    public File getResourcesDirectory() {
+        return Updater.appDirectory;
     }
 
 }

@@ -36,11 +36,6 @@ public class WindowsTarget implements Target {
     }
 
     @Override
-    public String getLaunchCommand() {
-        return Updater.appDirectory + "/Casterlabs-Caffeinated.exe";
-    }
-
-    @Override
     public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException {
         HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(HttpRequest.newBuilder().uri(URI.create("https://cdn.casterlabs.co/dist/Caffeinated-Installer.exe")), BodyHandlers.ofInputStream());
 
@@ -91,6 +86,11 @@ public class WindowsTarget implements Target {
     @Override
     public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException {
         // NOOP
+    }
+
+    @Override
+    public File getResourcesDirectory() {
+        return Updater.appDirectory;
     }
 
 }

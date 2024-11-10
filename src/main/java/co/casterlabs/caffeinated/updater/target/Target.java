@@ -17,6 +17,8 @@ public interface Target {
 
     public String getDownloadName();
 
+    public String getLaunchCommand();
+
     public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException;
 
     public File getUpdaterLaunchFile();

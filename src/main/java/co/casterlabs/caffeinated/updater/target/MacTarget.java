@@ -29,6 +29,11 @@ public class MacTarget implements Target {
     }
 
     @Override
+    public String getLaunchCommand() {
+        return new File(Updater.appDirectory, "Casterlabs-Caffeinated.app/Contents/MacOS/Casterlabs-Caffeinated").getAbsolutePath();
+    }
+
+    @Override
     public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException {
         throw new UnsupportedOperationException();
     }

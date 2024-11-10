@@ -28,6 +28,11 @@ public class LinuxTarget implements Target {
     }
 
     @Override
+    public String getLaunchCommand() {
+        return new File(Updater.appDirectory, "Casterlabs-Caffeinated").getAbsolutePath();
+    }
+
+    @Override
     public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException {
         throw new UnsupportedOperationException();
     }

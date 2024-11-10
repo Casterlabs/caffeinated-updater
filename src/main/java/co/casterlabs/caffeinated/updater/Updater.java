@@ -5,13 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ProcessBuilder.Redirect;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
-import java.util.Scanner;
 
 import co.casterlabs.caffeinated.updater.target.Target;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
@@ -19,8 +17,6 @@ import co.casterlabs.caffeinated.updater.util.WebUtil;
 import co.casterlabs.caffeinated.updater.util.archive.ArchiveExtractor;
 import co.casterlabs.caffeinated.updater.util.archive.Archives;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
-import co.casterlabs.commons.platform.OSDistribution;
-import co.casterlabs.commons.platform.Platform;
 import co.casterlabs.rakurai.json.Rson;
 import co.casterlabs.rakurai.json.element.JsonObject;
 import net.harawata.appdirs.AppDirsFactory;
@@ -153,43 +149,17 @@ public class Updater {
                 Files.writeString(expectUpdaterFile.toPath(), updaterCommandLine);
             }
 
-            ProcessBuilder pb = new ProcessBuilder()
+            new ProcessBuilder()
                 .directory(appDirectory)
-                .command(target.getLaunchCommand(), "--started-by-updater");
-
-            if (Platform.osDistribution == OSDistribution.MACOS) {
-                // On MacOS we do not want to keep the updater process open as it'll stick in
-                // the dock. So we start the process and kill the updater to make sure that
-                // doesn't happen.
-                pb.start();
-
-                // TODO look for the build_ok file before trusting the process. (kill & let
-                // the user know it's dead)
-                FastLogger.logStatic(LogLevel.INFO, "The process will now exit, this is so the updater's icon doesn't stick in the dock.");
-
-                dialog.close();
-                System.exit(0);
-                return;
-            }
-
-            Process proc = pb
-                .redirectOutput(Redirect.PIPE)
+                .command(target.getLaunchCommand(), "--started-by-updater")
                 .start();
 
-            try (Scanner in = new Scanner(proc.getInputStream())) {
-                while (true) {
-                    String line = in.nextLine();
-                    System.out.println(line);
+            // TODO look for the .build_ok file before trusting the process. (kill & let
+            // the user know it's dead)
+            FastLogger.logStatic(LogLevel.INFO, "The process will now exit, this is so the updater's icon doesn't stick in the dock.");
 
-                    // Look for "Starting the UI" before we close the dialog.
-                    if (line.contains("Starting the UI")) {
-                        FastLogger.logStatic(LogLevel.INFO, "UI Started!");
-                        dialog.close();
-                        System.exit(0);
-                        return;
-                    }
-                }
-            } catch (Exception ignored) {}
+            dialog.close();
+            System.exit(0);
         } catch (Exception e) {
             throw new UpdaterException(UpdaterException.Error.LAUNCH_FAILED, "Could not launch update :(", e);
         }

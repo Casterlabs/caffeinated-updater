@@ -29,11 +29,13 @@ import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
 public class Updater {
     public static final int VERSION = 31;
-    public static final String CHANNEL = System.getProperty("caffeinated.channel", "stable");
-    public static final String CHANNEL_URL_BASE = "https://cdn.casterlabs.co/dist/" + CHANNEL;
+    private static final String CHANNEL = System.getProperty("caffeinated.channel", "stable");
 
-    private static final String LAUNCHER_VERSION_URL = "https://cdn.casterlabs.co/dist/updater-version";
-    private static final String REMOTE_COMMIT_URL = CHANNEL_URL_BASE + "/commit";
+    private static final String DIST_URL_BASE = "https://cdn.casterlabs.co/caffeinated/dist";
+    private static final String CHANNEL_URL_BASE = DIST_URL_BASE + '/' + CHANNEL;
+
+    private static final String UPDATER_VERSION_URL = DIST_URL_BASE + "/updater-version";
+    private static final String CHANNEL_COMMIT_URL = CHANNEL_URL_BASE + "/commit";
 
     public static String appDataDirectory = AppDirsFactory.getInstance().getUserDataDir("casterlabs-caffeinated", null, null, true);
     public static File appDirectory = new File(appDataDirectory, "app");
@@ -47,7 +49,7 @@ public class Updater {
     public static final Target target = Target.get();
 
     public static boolean isLauncherOutOfDate() throws IOException, InterruptedException {
-        int remoteLauncherVersion = Integer.parseInt(WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(LAUNCHER_VERSION_URL))).trim());
+        int remoteLauncherVersion = Integer.parseInt(WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(UPDATER_VERSION_URL))).trim());
         return VERSION < remoteLauncherVersion;
     }
 
@@ -80,7 +82,7 @@ public class Updater {
             if (!installedChannel.equals(CHANNEL)) return true;
 
             String installedCommit = buildInfo.getString("commit");
-            String remoteCommit = WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(REMOTE_COMMIT_URL))).trim();
+            String remoteCommit = WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(CHANNEL_COMMIT_URL))).trim();
             if (!remoteCommit.equals(installedCommit)) return true;
 
             return false;

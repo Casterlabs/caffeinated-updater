@@ -42,7 +42,7 @@ public class WindowsTarget implements Target {
 
     @Override
     public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException {
-        HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(HttpRequest.newBuilder().uri(URI.create("https://cdn.casterlabs.co/dist/Caffeinated-Installer.exe")), BodyHandlers.ofInputStream());
+        HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(HttpRequest.newBuilder().uri(URI.create(Updater.DIST_URL_BASE + "/Caffeinated-Installer.exe")), BodyHandlers.ofInputStream());
 
         final File tempInstaller = new File(System.getProperty("java.io.tmpdir"), "Caffeinated-Installer.exe");
 

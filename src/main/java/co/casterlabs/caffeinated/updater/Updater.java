@@ -31,8 +31,8 @@ public class Updater {
     public static final int VERSION = 31;
     private static final String CHANNEL = System.getProperty("caffeinated.channel", "stable");
 
-    private static final String DIST_URL_BASE = "https://cdn.casterlabs.co/caffeinated/dist";
-    private static final String CHANNEL_URL_BASE = DIST_URL_BASE + '/' + CHANNEL;
+    public static final String DIST_URL_BASE = "https://cdn.casterlabs.co/caffeinated/dist";
+    public static final String CHANNEL_URL_BASE = DIST_URL_BASE + '/' + CHANNEL;
 
     private static final String UPDATER_VERSION_URL = DIST_URL_BASE + "/updater-version";
     private static final String CHANNEL_COMMIT_URL = CHANNEL_URL_BASE + "/commit";

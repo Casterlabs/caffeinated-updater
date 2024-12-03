@@ -81,6 +81,13 @@ public class Launcher {
         dieFile.createNewFile();
         Thread.sleep(1500);
         dieFile.delete();
+        Thread.sleep(500);
+
+        try {
+            Updater.target.forceKillApp();
+        } catch (Exception e) {
+            FastLogger.logStatic(LogLevel.WARNING, "Could not force kill the app, this is probably fine.\n%s", e);
+        }
 
         doChecks();
     }

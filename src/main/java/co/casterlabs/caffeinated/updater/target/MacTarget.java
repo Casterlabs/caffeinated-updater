@@ -14,6 +14,14 @@ import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 public class MacTarget implements Target {
 
     @Override
+    public void forceKillApp() throws IOException, InterruptedException {
+        Runtime.getRuntime().exec(new String[] {
+                "pkill",
+                "Casterlabs-Caffeinated"
+        }).waitFor();
+    }
+
+    @Override
     public OSDistribution supportedOS() {
         return OSDistribution.MACOS;
     }

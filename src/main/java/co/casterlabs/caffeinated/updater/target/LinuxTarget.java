@@ -13,6 +13,14 @@ import co.casterlabs.commons.platform.Platform;
 public class LinuxTarget implements Target {
 
     @Override
+    public void forceKillApp() throws IOException, InterruptedException {
+        Runtime.getRuntime().exec(new String[] {
+                "pkill",
+                "Casterlabs-Caffeinated"
+        }).waitFor();
+    }
+
+    @Override
     public OSDistribution supportedOS() {
         return OSDistribution.LINUX;
     }

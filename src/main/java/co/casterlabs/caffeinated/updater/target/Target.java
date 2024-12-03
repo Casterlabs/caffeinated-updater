@@ -11,6 +11,8 @@ import co.casterlabs.commons.platform.Platform;
 
 public interface Target {
 
+    public void forceKillApp() throws IOException, InterruptedException;
+
     public OSDistribution supportedOS();
 
     public List<String> supportedTargets();

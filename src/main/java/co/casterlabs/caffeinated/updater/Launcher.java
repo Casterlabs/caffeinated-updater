@@ -83,11 +83,11 @@ public class Launcher {
         dieFile.delete();
         Thread.sleep(500);
 
-        try {
-            Updater.target.forceKillApp();
-        } catch (Throwable t) {
-            FastLogger.logStatic(LogLevel.WARNING, "Could not force kill the app, this is probably fine.\n%s", t);
-        }
+//        try {
+//            Updater.target.forceKillApp();
+//        } catch (Throwable t) {
+//            FastLogger.logStatic(LogLevel.WARNING, "Could not force kill the app, this is probably fine.\n%s", t);
+//        }
 
         doChecks();
     }

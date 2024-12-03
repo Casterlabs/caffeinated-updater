@@ -28,6 +28,7 @@ public class UpdaterPane extends JPanel {
             "himichannel",
             "statice06",
             "dayoshi",
+            "brophersgrimm",
     };
 
     public static String chosenStreamer = STREAMERS[0]; // Default is required for WindowBuilder.

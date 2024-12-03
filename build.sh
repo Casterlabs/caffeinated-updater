@@ -18,7 +18,7 @@ if [[ $@ == *"dist-windows"* ]]; then
     java -jar bundler.jar bundle \
         --arch x86_64 --os windows \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     echo "------------ Finished bundling for Windows ------------"
 fi
@@ -29,12 +29,12 @@ if [[ $@ == *"dist-macos"* ]]; then
     java -jar bundler.jar bundle \
         --arch aarch64 --os macos \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     java -jar bundler.jar bundle \
         --arch x86_64 --os macos \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     echo "------------ Finished bundling for macOS ------------"
 fi
@@ -45,17 +45,17 @@ if [[ $@ == *"dist-linux"* ]]; then
     java -jar bundler.jar bundle \
         --arch aarch64 --os gnulinux \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     java -jar bundler.jar bundle \
         --arch arm --os gnulinux \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     java -jar bundler.jar bundle \
         --arch x86_64 --os gnulinux \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     echo "------------ Finished bundling for Linux ------------"
 fi

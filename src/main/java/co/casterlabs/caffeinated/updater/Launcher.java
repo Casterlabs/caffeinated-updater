@@ -143,10 +143,11 @@ public class Launcher {
             FastLogger.logStatic(LogLevel.SEVERE, e.getMessage());
             FastLogger.logException(e.getCause());
 
+            TimeUnit.SECONDS.sleep(10);
+
             switch (e.getError()) {
                 case LAUNCH_FAILED:
                     Updater.borkInstall();
-                    TimeUnit.SECONDS.sleep(2);
                     dialog.setStatus("Could not launch update, redownloading in 3.");
                     TimeUnit.SECONDS.sleep(1);
                     dialog.setStatus("Could not launch update, redownloading in 2.");
@@ -158,7 +159,6 @@ public class Launcher {
 
                 case DOWNLOAD_FAILED:
                     Updater.borkInstall();
-                    TimeUnit.SECONDS.sleep(2);
                     dialog.setStatus("Update failed, retrying in 3.");
                     TimeUnit.SECONDS.sleep(1);
                     dialog.setStatus("Update failed, retrying in 2.");

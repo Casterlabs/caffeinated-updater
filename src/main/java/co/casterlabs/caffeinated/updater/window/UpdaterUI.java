@@ -40,7 +40,7 @@ public class UpdaterUI extends JPanel {
         statusText.setFont(FONT);
         statusText.setForeground(UpdaterDialog.TEXT_COLOR);
         statusText.setOpaque(false);
-        statusText.setText("Checking for updates...");
+        this.setStatus("Checking for updates...");
         this.add(statusText);
 
         JLabel streamerText = new JLabel();
@@ -85,7 +85,14 @@ public class UpdaterUI extends JPanel {
     }
 
     public void setStatus(@NonNull String status) {
-        this.statusText.setText(status);
+        String[] splitStatus = status.split("\n", 2);
+        if (splitStatus.length == 1) {
+            this.statusText.setText(status);
+        } else {
+            this.statusText.setText(splitStatus[0] + " 🛈");
+            this.statusText.setToolTipText(splitStatus[1]);
+        }
+
         this.repaint();
     }
 

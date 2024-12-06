@@ -61,31 +61,34 @@ public class Updater {
         new File(appDirectory, "current_build_info.json").delete();
     }
 
-    public static boolean needsUpdate() {
+    /**
+     * @return 0 for up-to-date, 1 for needs update, 2 for error
+     */
+    public static int needsUpdate() {
+        File buildInfoFile = new File(appDirectory, "current_build_info.json");
+
+        // Check for existence of files.
+        if (!buildInfoFile.exists()) {
+            FastLogger.logStatic("Build was not healthy, forcing redownload.");
+            return 1;
+        }
+
         try {
-            File buildInfoFile = new File(appDirectory, "current_build_info.json");
-
-            // Check for existence of files.
-            if (!buildInfoFile.exists()) {
-                FastLogger.logStatic("Build was not healthy, forcing redownload.");
-                return true;
-            }
-
             JsonObject buildInfo = Rson.DEFAULT.fromJson(FileUtil.readFile(buildInfoFile), JsonObject.class);
 
             // Check the version.
-            String installedChannel = buildInfo.getString("buildChannel");
-            if (!installedChannel.equals(CHANNEL)) return true;
-
             String installedCommit = buildInfo.getString("commit");
             String remoteCommit = WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(CHANNEL_COMMIT_URL))).trim();
-            if (!remoteCommit.equals(installedCommit)) return true;
+            if (!remoteCommit.equals(installedCommit)) return 1;
 
-            return false;
+            // Check the channel.
+            String installedChannel = buildInfo.getString("buildChannel");
+            if (!installedChannel.equals(CHANNEL)) return 1;
         } catch (IOException | InterruptedException e) {
-            FastLogger.logException(e);
-            return true;
+            return 2;
         }
+
+        return 0;
     }
 
     public static void downloadAndInstallUpdate(UpdaterDialog dialog) throws UpdaterException {

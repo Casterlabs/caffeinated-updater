@@ -123,15 +123,23 @@ public class Launcher {
         try {
             // Artificial delay added in here because it'd be too jarring otherwise.
             // Heh, JARring, haha.
+            TimeUnit.SECONDS.sleep(1);
 
-            if (Updater.needsUpdate()) {
-                FastLogger.logStatic("Downloading updates.");
-                Updater.downloadAndInstallUpdate(dialog);
-                dialog.setStatus("Done!");
-            } else {
-                TimeUnit.SECONDS.sleep(1);
-                FastLogger.logStatic("You are up to date!");
-                dialog.setStatus("You are up to date!");
+            switch (Updater.needsUpdate()) {
+                case 0: // up-to-date
+                    FastLogger.logStatic("You are up to date!");
+                    dialog.setStatus("You are up to date!");
+                    break;
+
+                case 1: // needs update
+                    FastLogger.logStatic("Downloading updates.");
+                    Updater.downloadAndInstallUpdate(dialog);
+                    dialog.setStatus("Done!");
+                    break;
+
+                case 2: // error
+                    dialog.setStatus("Failed to check for updates, launching anyway.");
+                    break;
             }
 
             TimeUnit.SECONDS.sleep(2);

@@ -6,11 +6,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandler;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 
 import lombok.NonNull;
 
 public class WebUtil {
-    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final HttpClient client = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(15))
+        .build();
 
     public static <T> HttpResponse<T> sendRawHttpRequest(@NonNull HttpRequest.Builder builder, @NonNull BodyHandler<T> handler) throws IOException, InterruptedException {
         return client.send(builder.build(), handler);

@@ -10,7 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
-import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 import co.casterlabs.caffeinated.updater.target.Target;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
@@ -74,6 +74,17 @@ public class Updater {
             return 1;
         }
 
+        Thread currentThread = Thread.currentThread();
+        Thread watchdog = new Thread(() -> {
+            try {
+                currentThread.join(TimeUnit.SECONDS.toMillis(15));
+                currentThread.interrupt();
+            } catch (InterruptedException ignored) {
+                // Everything succeeded :D
+            }
+        });
+        watchdog.start();
+
         try {
             JsonObject buildInfo = Rson.DEFAULT.fromJson(FileUtil.readFile(buildInfoFile), JsonObject.class);
 
@@ -82,7 +93,6 @@ public class Updater {
             String remoteCommit = WebUtil.sendHttpRequest(
                 HttpRequest.newBuilder()
                     .uri(URI.create(CHANNEL_COMMIT_URL))
-                    .timeout(Duration.ofSeconds(15))
             ).trim();
             if (!remoteCommit.equals(installedCommit)) return 1;
 
@@ -91,6 +101,9 @@ public class Updater {
             if (!installedChannel.equals(CHANNEL)) return 1;
         } catch (IOException | InterruptedException e) {
             return 2;
+        } finally {
+            Thread.interrupted(); // Clear interrupted status.
+            watchdog.interrupt();
         }
 
         return 0;

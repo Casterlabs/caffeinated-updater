@@ -10,6 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
+import java.time.Duration;
 
 import co.casterlabs.caffeinated.updater.target.Target;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
@@ -78,7 +79,11 @@ public class Updater {
 
             // Check the version.
             String installedCommit = buildInfo.getString("commit");
-            String remoteCommit = WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(CHANNEL_COMMIT_URL))).trim();
+            String remoteCommit = WebUtil.sendHttpRequest(
+                HttpRequest.newBuilder()
+                    .uri(URI.create(CHANNEL_COMMIT_URL))
+                    .timeout(Duration.ofSeconds(15))
+            ).trim();
             if (!remoteCommit.equals(installedCommit)) return 1;
 
             // Check the channel.

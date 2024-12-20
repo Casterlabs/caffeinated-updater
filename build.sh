@@ -18,6 +18,7 @@ if [[ $@ == *"dist-windows"* ]]; then
     java -jar bundler.jar bundle \
         --arch x86_64 --os windows \
         --id $APP_ID --name $APP_NAME --icon icon.png \
+        --sign 'cmd.exe /C C:\signing\sign.bat Casterlabs-Caffeinated.exe' \
         --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     echo "------------ Finished bundling for Windows ------------"

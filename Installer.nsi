@@ -42,20 +42,17 @@ RequestExecutionLevel admin
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_INSTFILES
   
-Var deleteUserData ; You could just store the HWND in $1 etc if you don't want this extra variable
+; Var deleteUserData ; You could just store the HWND in $1 etc if you don't want this extra variable
 
 ;--------------------------------
 ; Section - Installer
 
-Function .onInit
-  ; Check to see if already installed (old installer).
-  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" "UninstallString"
-  IfFileExists $R0 0 no_delete_previous
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" ; Forcibly remove the old version.
+Section "Remove Previous Version (Keep data)"
+  SectionIn RO
+  
   RMDir /r "$INSTDIR"
   MessageBox MB_ICONEXCLAMATION|MB_OK "Removed previous version."
-  no_delete_previous:
-FunctionEnd
+SectionEnd
 
 Section "App"
   SectionIn RO

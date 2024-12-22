@@ -84,16 +84,15 @@ public class WindowsTarget implements Target {
             dialog.setProgress(-1);
 
             Runtime.getRuntime().exec(new String[] {
-//                    "cmd.exe",
-//                    "/c",
-//                    "runas",
-//                    "/user:Administrator",
+                    "cmd.exe",
+                    "/c",
+                    "runas",
+                    "/user:Administrator",
                     tempInstaller.getCanonicalPath()
             });
             TimeUnit.SECONDS.sleep(2);
             System.exit(0);
         }
-        throw new UnsupportedOperationException();
     }
 
     @Override

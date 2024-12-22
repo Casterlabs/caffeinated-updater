@@ -1,4 +1,4 @@
-Copyright 2020-2023 Casterlabs
+Copyright 2020-2025 Casterlabs
 
 This End-User License Agreement (EULA) is a legal agreement between you (either as an individual or on behalf of an entity) and Casterlabs regarding your use of the Caffeinated desktop application, and associated documentation (the "Software"). IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS EULA, DO NOT INSTALL, USE, OR COPY THE SOFTWARE.
 

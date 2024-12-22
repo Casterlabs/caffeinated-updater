@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-windows-x86_64.zip
-          path: dist/artifacts/Casterlabs-Caffeinated-windows-x86_64.zip
+          path: dist/artifacts/Casterlabs-Caffeinated-Updater-windows-x86_64.zip
       
       - name: 🆙 Upload the Windows installer (x86_64)
         uses: actions/upload-artifact@v3
@@ -70,13 +70,13 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-macos-aarch64.tar.gz
-          path: dist/artifacts/Casterlabs-Caffeinated-macos-aarch64.tar.gz
+          path: dist/artifacts/Casterlabs-Caffeinated-Updater-macos-aarch64.tar.gz
 
       - name: 🆙 Upload the macOS artifact (x86_64)
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-macos-x86_64.tar.gz
-          path: dist/artifacts/Casterlabs-Caffeinated-macos-x86_64.tar.gz
+          path: dist/artifacts/Casterlabs-Caffeinated-Updater-macos-x86_64.tar.gz
 
   build_linux:
     runs-on: ubuntu-latest
@@ -101,16 +101,16 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-gnulinux-aarch64.tar.gz
-          path: dist/artifacts/Casterlabs-Caffeinated-gnulinux-aarch64.tar.gz
+          path: dist/artifacts/Casterlabs-Caffeinated-Updater-gnulinux-aarch64.tar.gz
 
       - name: 🆙 Upload the Linux artifact (arm)
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-gnulinux-arm.tar.gz
-          path: dist/artifacts/Casterlabs-Caffeinated-gnulinux-arm.tar.gz
+          path: dist/artifacts/Casterlabs-Caffeinated-Updater-gnulinux-arm.tar.gz
 
       - name: 🆙 Upload the Linux artifact (x86_64)
         uses: actions/upload-artifact@v3
         with:
           name: Casterlabs-Caffeinated-gnulinux-x86_64.tar.gz
-          path: dist/artifacts/Casterlabs-Caffeinated-gnulinux-x86_64.tar.gz
+          path: dist/artifacts/Casterlabs-Caffeinated-Updater-gnulinux-x86_64.tar.gz

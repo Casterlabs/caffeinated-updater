@@ -46,6 +46,8 @@ public class Updater {
     public static final Target target = Target.get();
 
     public static boolean isLauncherOutOfDate() throws IOException, InterruptedException {
+        if (System.getProperty("caffeinated.reinstall", "false").equalsIgnoreCase("true")) return true;
+
         int remoteLauncherVersion = Integer.parseInt(WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(UPDATER_VERSION_URL))).trim());
         return VERSION < remoteLauncherVersion;
     }

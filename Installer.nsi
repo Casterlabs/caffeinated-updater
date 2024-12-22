@@ -47,14 +47,13 @@ RequestExecutionLevel admin
 ;--------------------------------
 ; Section - Installer
 
-Section "Remove Previous Version (Keep data)"
+Section "Remove Previous Version" RemovePrev
   SectionIn RO
   
   RMDir /r "$INSTDIR"
-  MessageBox MB_ICONEXCLAMATION|MB_OK "Removed previous version."
 SectionEnd
 
-Section "App"
+Section "App" AppInst
   SectionIn RO
   
   SetOutPath "$INSTDIR"
@@ -148,12 +147,16 @@ SectionEnd
 !insertmacro MUI_LANGUAGE "English"
 
 ;Language strings
+LangString DESC_RemovePrev ${LANG_ENGLISH} "Remove the previous version (keeping user data intact)."
+LangString DESC_AppInst ${LANG_ENGLISH} "Install the app."
 LangString DESC_DeskShort ${LANG_ENGLISH} "Create Shortcut on Desktop."
-LangString DESC_StartShort ${LANG_ENGLISH} "Create Shortcut on Desktop."
+LangString DESC_StartShort ${LANG_ENGLISH} "Create Start Menu folder."
 LangString DESC_DeleteUserData ${LANG_ENGLISH} "Delete user preferences and plugins"
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${RemovePrev} $(DESC_AppInst)
+  !insertmacro MUI_DESCRIPTION_TEXT ${AppInst} $(DESC_AppInst)
   !insertmacro MUI_DESCRIPTION_TEXT ${DeskShort} $(DESC_DeskShort)
   !insertmacro MUI_DESCRIPTION_TEXT ${StartShort} $(DESC_StartShort)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

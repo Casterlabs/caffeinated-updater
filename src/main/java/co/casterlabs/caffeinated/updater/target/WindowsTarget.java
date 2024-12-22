@@ -82,17 +82,21 @@ public class WindowsTarget implements Target {
 
             dest.flush();
             dialog.setProgress(-1);
-
-            Runtime.getRuntime().exec(new String[] {
-                    "cmd.exe",
-                    "/c",
-                    "runas",
-                    "/user:Administrator",
-                    tempInstaller.getCanonicalPath()
-            });
-            TimeUnit.SECONDS.sleep(2);
-            System.exit(0);
         }
+
+        new ProcessBuilder()
+            .command(
+                //                "rundll32",
+//                "url.dll,FileProtocolHandler",
+//                tempInstaller.getCanonicalPath()
+                "powershell",
+                "-Command",
+                "\"Start-Process '" + tempInstaller.getCanonicalPath() + "' -Verb RunAs\""
+            )
+            .inheritIO()
+            .start();
+        TimeUnit.SECONDS.sleep(2);
+        System.exit(0);
     }
 
     @Override

@@ -155,7 +155,7 @@ LangString DESC_DeleteUserData ${LANG_ENGLISH} "Delete user preferences and plug
 
 ;Assign language strings to sections
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${RemovePrev} $(DESC_AppInst)
+  !insertmacro MUI_DESCRIPTION_TEXT ${RemovePrev} $(DESC_RemovePrev)
   !insertmacro MUI_DESCRIPTION_TEXT ${AppInst} $(DESC_AppInst)
   !insertmacro MUI_DESCRIPTION_TEXT ${DeskShort} $(DESC_DeskShort)
   !insertmacro MUI_DESCRIPTION_TEXT ${StartShort} $(DESC_StartShort)

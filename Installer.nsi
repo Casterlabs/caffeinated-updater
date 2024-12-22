@@ -50,9 +50,11 @@ Var deleteUserData ; You could just store the HWND in $1 etc if you don't want t
 Function .onInit
   ; Check to see if already installed (old installer).
   ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" "UninstallString"
-  IfFileExists $R0 +1 +3
+  IfFileExists $R0 0 no_delete_previous
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" ; Forcibly remove the old version.
   RMDir /r "$INSTDIR"
+  MessageBox MB_ICONEXCLAMATION|MB_OK "Removed previous version."
+  no_delete_previous:
 FunctionEnd
 
 Section "App"
@@ -66,9 +68,9 @@ Section "App"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" \
                  "DisplayName" "${NAME}"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" \
-                 "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
+                 "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" \
-                 "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
+                 "QuietUninstallString" "$\"$INSTDIR\Uninstall.exe$\" /S"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}" \
                  "EstimatedSize" 610000
 SectionEnd
@@ -82,7 +84,7 @@ Section "Start Menu Shortcut" StartShort
   IfSilent +4 ; Don't create StartMenu shortcut when silent.
   CreateDirectory "$SMPROGRAMS\${COMPANY}"
   CreateShortCut "$SMPROGRAMS\${COMPANY}\${NAME}.lnk" "$INSTDIR\Casterlabs-Caffeinated-Updater.exe"
-  CreateShortCut "$SMPROGRAMS\${COMPANY}\Uninstall ${NAME}.lnk" "$INSTDIR\uninstall.exe"
+  CreateShortCut "$SMPROGRAMS\${COMPANY}\Uninstall ${NAME}.lnk" "$INSTDIR\Uninstall.exe"
 SectionEnd
 
 ;--------------------------------

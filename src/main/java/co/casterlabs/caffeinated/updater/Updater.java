@@ -5,16 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 import co.casterlabs.caffeinated.updater.target.Target;
+import co.casterlabs.caffeinated.updater.util.CdnUtil;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
-import co.casterlabs.caffeinated.updater.util.WebUtil;
 import co.casterlabs.caffeinated.updater.util.archive.ArchiveExtractor;
 import co.casterlabs.caffeinated.updater.util.archive.Archives;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
@@ -28,11 +25,11 @@ public class Updater {
     public static final int VERSION = 32;
     private static final String CHANNEL = System.getProperty("caffeinated.channel", "stable");
 
-    public static final String DIST_URL_BASE = "https://cdn.casterlabs.co/caffeinated/dist";
-    public static final String CHANNEL_URL_BASE = DIST_URL_BASE + '/' + CHANNEL;
+    public static final String DIST_PATH_BASE = "/caffeinated/dist";
+    public static final String CHANNEL_PATH_BASE = DIST_PATH_BASE + '/' + CHANNEL;
 
-    private static final String UPDATER_VERSION_URL = DIST_URL_BASE + "/updater-version";
-    private static final String CHANNEL_COMMIT_URL = CHANNEL_URL_BASE + "/commit";
+    private static final String UPDATER_VERSION_PATH = DIST_PATH_BASE + "/updater-version";
+    private static final String CHANNEL_COMMIT_PATH = CHANNEL_PATH_BASE + "/commit";
 
     public static String appDataDirectory = AppDirsFactory.getInstance().getUserDataDir("casterlabs-caffeinated", null, null, true);
     public static File appDirectory = new File(appDataDirectory, "app");
@@ -48,7 +45,7 @@ public class Updater {
     public static boolean isLauncherOutOfDate() throws IOException, InterruptedException {
         if (System.getProperty("caffeinated.reinstall", "false").equalsIgnoreCase("true")) return true;
 
-        int remoteLauncherVersion = Integer.parseInt(WebUtil.sendHttpRequest(HttpRequest.newBuilder().uri(URI.create(UPDATER_VERSION_URL))).trim());
+        int remoteLauncherVersion = Integer.parseInt(CdnUtil.string(UPDATER_VERSION_PATH).trim());
         return VERSION < remoteLauncherVersion;
     }
 
@@ -92,10 +89,7 @@ public class Updater {
 
             // Check the version.
             String installedCommit = buildInfo.getString("commit");
-            String remoteCommit = WebUtil.sendHttpRequest(
-                HttpRequest.newBuilder()
-                    .uri(URI.create(CHANNEL_COMMIT_URL))
-            ).trim();
+            String remoteCommit = CdnUtil.string(CHANNEL_COMMIT_PATH).trim();
             if (!remoteCommit.equals(installedCommit)) return 1;
 
             // Check the channel.
@@ -117,10 +111,8 @@ public class Updater {
         File updateFile = new File(appDirectory, target.getDownloadName());
 
         try {
-            HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(
-                HttpRequest.newBuilder()
-                    .uri(URI.create(String.format("%s/%s", CHANNEL_URL_BASE, target.getDownloadName()))),
-                BodyHandlers.ofInputStream()
+            HttpResponse<InputStream> response = CdnUtil.stream(
+                String.format("%s/%s", CHANNEL_PATH_BASE, target.getDownloadName())
             );
 
             // Download archive.

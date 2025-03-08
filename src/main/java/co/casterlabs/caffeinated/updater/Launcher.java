@@ -89,37 +89,43 @@ public class Launcher {
             FastLogger.logStatic(LogLevel.WARNING, "Could not force kill the app, this is probably fine.\n%s", t);
         }
 
-        doChecks();
-    }
-
-    public static void doChecks() throws Exception {
         if (System.getProperty("caffeinated.donotupdate", "false").equalsIgnoreCase("true")) {
             dialog.setStatus("Twiddling my thumbs...");
-            Thread.sleep(Long.MAX_VALUE);
+            try {
+                Thread.sleep(Long.MAX_VALUE);
+            } catch (InterruptedException ignored) {}
         }
 
         dialog.setStatus("Checking for updates...");
-
-        if (Updater.isLauncherOutOfDate()) {
-            TimeUnit.SECONDS.sleep(1);
-
-            try {
-                Updater.target.updateUpdater(dialog);
-            } catch (Exception e) {
-                FastLogger.logException(e);
-
-                // TODO display this message better and give a button to download.
-                dialog.setLoading(false);
-                dialog.setStatus("Your launcher is out of date! (Download from casterlabs.co)");
-
-                Desktop.getDesktop().browse(new URI("https://casterlabs.co"));
-            }
-        } else {
-            checkForUpdates();
-        }
+        checkForUpdates();
     }
 
     private static void checkForUpdates() throws Exception {
+        try {
+            if (Updater.isLauncherOutOfDate()) {
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException ignored) {}
+
+                try {
+                    Updater.target.updateUpdater(dialog);
+                } catch (Exception e) {
+                    FastLogger.logException(e);
+
+                    // TODO display this message better and give a button to download.
+                    dialog.setLoading(false);
+                    dialog.setStatus("Your launcher is out of date! (Download from casterlabs.co)");
+
+                    Desktop.getDesktop().browse(URI.create("https://casterlabs.co"));
+                }
+                return;
+            }
+        } catch (Exception e) {
+            dialog.setStatus("Launcher update failed, ignoring...");
+            TimeUnit.SECONDS.sleep(5);
+            dialog.setStatus("Checking for updates...");
+        }
+
         try {
             // Artificial delay added in here because it'd be too jarring otherwise.
             // Heh, JARring, haha.

@@ -5,16 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import co.casterlabs.caffeinated.updater.Updater;
-import co.casterlabs.caffeinated.updater.util.WebUtil;
+import co.casterlabs.caffeinated.updater.util.CdnUtil;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
 import co.casterlabs.commons.platform.OSDistribution;
 
@@ -52,7 +49,7 @@ public class WindowsTarget implements Target {
 
     @Override
     public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException {
-        HttpResponse<InputStream> response = WebUtil.sendRawHttpRequest(HttpRequest.newBuilder().uri(URI.create(Updater.DIST_URL_BASE + "/Caffeinated-Installer.exe")), BodyHandlers.ofInputStream());
+        HttpResponse<InputStream> response = CdnUtil.stream(Updater.DIST_PATH_BASE + "/Caffeinated-Installer.exe");
 
         final File tempInstaller = new File(System.getProperty("java.io.tmpdir"), "Caffeinated-Installer.exe");
 
@@ -86,7 +83,7 @@ public class WindowsTarget implements Target {
 
         new ProcessBuilder()
             .command(
-                //                "rundll32",
+                // "rundll32",
 //                "url.dll,FileProtocolHandler",
 //                tempInstaller.getCanonicalPath()
                 "powershell",

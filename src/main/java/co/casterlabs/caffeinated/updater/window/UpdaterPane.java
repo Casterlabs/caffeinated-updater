@@ -23,7 +23,6 @@ public class UpdaterPane extends JPanel {
 
     private static final String[] STREAMERS = {
             "stallion",
-            "flankthomas",
             "jcodude",
             "himichannel",
             "statice06",

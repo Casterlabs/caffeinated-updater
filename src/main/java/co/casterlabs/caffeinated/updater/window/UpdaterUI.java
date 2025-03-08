@@ -88,8 +88,9 @@ public class UpdaterUI extends JPanel {
         String[] splitStatus = status.split("\n", 2);
         if (splitStatus.length == 1) {
             this.statusText.setText(status);
+            this.statusText.setToolTipText(null);
         } else {
-            this.statusText.setText(splitStatus[0] + " 🛈");
+            this.statusText.setText("<html>" + splitStatus[0] + " <span color=\"#6495ed\">🛈</span></html>");
             this.statusText.setToolTipText(splitStatus[1]);
         }
 

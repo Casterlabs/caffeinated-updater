@@ -22,7 +22,7 @@ import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
 public class Updater {
-    public static final int VERSION = 32;
+    public static final int VERSION = 33;
     private static final String CHANNEL = System.getProperty("caffeinated.channel", "stable");
 
     public static final String DIST_PATH_BASE = "/caffeinated/dist";

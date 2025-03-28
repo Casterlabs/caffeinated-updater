@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# This script requires you to set CHANNEL=stable before running.
+
 set -e -o pipefail
 
 APP_ID="co.casterlabs.caffeinated"
@@ -19,7 +21,7 @@ if [[ $@ == *"dist-windows"* ]]; then
         --arch x86_64 --os windows \
         --id $APP_ID --name $APP_NAME --icon icon.png \
         --sign "cmd.exe /C C:\signing\sign.bat $APP_NAME.exe" \
-        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=$CHANNEL --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     echo "------------ Finished bundling for Windows ------------"
 fi
@@ -30,12 +32,12 @@ if [[ $@ == *"dist-macos"* ]]; then
     java -jar bundler.jar bundle \
         --arch aarch64 --os macos \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=$CHANNEL --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     java -jar bundler.jar bundle \
         --arch x86_64 --os macos \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=$CHANNEL --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     echo "------------ Finished bundling for macOS ------------"
 fi
@@ -46,17 +48,17 @@ if [[ $@ == *"dist-linux"* ]]; then
     java -jar bundler.jar bundle \
         --arch aarch64 --os gnulinux \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=$CHANNEL --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     java -jar bundler.jar bundle \
         --arch arm --os gnulinux \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=$CHANNEL --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     java -jar bundler.jar bundle \
         --arch x86_64 --os gnulinux \
         --id $APP_ID --name $APP_NAME --icon icon.png \
-        --java 11 --arg=-Dcaffeinated.channel=stable --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
+        --java 11 --arg=-Dcaffeinated.channel=$CHANNEL --dependency target/Casterlabs-Caffeinated-Updater.jar --main $MAIN_CLASS
 
     echo "------------ Finished bundling for Linux ------------"
 fi

@@ -11,4 +11,5 @@ runs:
         cache: maven
 
     - name: 🔨 Compile the updater
+      shell: bash
       run: bash build.sh compile

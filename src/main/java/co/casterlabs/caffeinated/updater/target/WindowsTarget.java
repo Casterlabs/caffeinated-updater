@@ -29,7 +29,7 @@ class WindowsTarget implements Target {
 
     @Override
     public String getDownloadName() {
-        return "Casterlabs-Caffeinated-windows-x86_64.zip";
+        return String.format("Casterlabs-Caffeinated-windows-%s.zip", Platform.archTarget);
     }
 
     @Override

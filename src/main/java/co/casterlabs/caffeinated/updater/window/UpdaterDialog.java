@@ -9,6 +9,7 @@ import java.awt.Point;
 import java.awt.Taskbar;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.RoundRectangle2D;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
@@ -28,6 +29,7 @@ public class UpdaterDialog extends JFrame implements Closeable {
 
     public static final int WIDTH = 500;
     public static final int HEIGHT = 320;
+    public static final int ARC = 11;
 
     public static final Color TRANSPARENT_COLOR = new Color(0, 0, 0, 0);
     public static final Color BACKGROUND_COLOR = new Color(18, 18, 18); // #121212
@@ -55,9 +57,10 @@ public class UpdaterDialog extends JFrame implements Closeable {
         this.getContentPane().setBackground(BACKGROUND_COLOR);
         this.setForeground(TEXT_COLOR);
 
-        // Size.
+        // Size & Shape.
         this.setSize(WIDTH, HEIGHT);
         this.setResizable(false);
+        this.setShape(new RoundRectangle2D.Double(0, 0, WIDTH, HEIGHT, ARC, ARC));
 
         // Drag listener.
         {

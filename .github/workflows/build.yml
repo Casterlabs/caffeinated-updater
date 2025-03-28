@@ -79,6 +79,14 @@ jobs:
         shell: cmd
         run: C:\signing\sign.bat dist\Casterlabs-Caffeinated-Setup.exe
 
+      - name: 📝 Rename the Windows installer exe
+        shell: cmd
+        run: |
+          setlocal enabledelayedexpansion
+          set "filename=dist\Casterlabs-Caffeinated-Setup.exe"
+          set "newname=dist\Casterlabs-Caffeinated-Setup-${{ matrix.channel }}.exe"
+          ren "!filename!" "!newname!"
+
       - name: 🆙 Upload the Windows artifact (x86_64)
         uses: actions/upload-artifact@v4
         with:
@@ -89,7 +97,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Casterlabs-Caffeinated-Setup-${{ matrix.channel }}.exe
-          path: dist/Casterlabs-Caffeinated-Setup.exe
+          path: dist/Casterlabs-Caffeinated-Setup-${{ matrix.channel }}.exe
 
   # ------------------------ #
   #          macOS           #

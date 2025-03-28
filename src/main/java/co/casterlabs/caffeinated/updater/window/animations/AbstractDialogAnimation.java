@@ -59,7 +59,7 @@ public abstract class AbstractDialogAnimation {
             boolean isTheTenth = calendarDate == 10;
 
             if (isFeburay && isTheTenth) {
-                animation = new KamihinokinaiAnimation(animationContext);
+                animation = new KamifusenAnimation(animationContext);
             }
         }
 

@@ -12,7 +12,7 @@ import lombok.SneakyThrows;
 
 // https://www.city.semboku.akita.jp/en/sightseeing/spot/06_kamifuusen.html
 // https://en.wikipedia.org/wiki/Kamif%C5%ABsen
-class KamihinokinaiAnimation extends AbstractSnowflakeAnimation {
+class KamifusenAnimation extends AbstractSnowflakeAnimation {
     private static final int FLAKE_COUNT = 9; // MUST BE DIVISIBLE BY 3
 
     private static final int HORIZONTAL_SPEED = 25; // Pixels/s
@@ -23,7 +23,7 @@ class KamihinokinaiAnimation extends AbstractSnowflakeAnimation {
     private BufferedImage image;
 
     @SneakyThrows
-    public KamihinokinaiAnimation(AnimationContext animationContext) {
+    public KamifusenAnimation(AnimationContext animationContext) {
         super(animationContext, FLAKE_COUNT);
         this.image = ImageIO.read(FileUtil.loadResourceAsUrl("assets/animation/floating_lantern.png"));
     }

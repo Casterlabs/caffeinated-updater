@@ -42,8 +42,8 @@ if [[ $@ == *"dist-macos"* ]]; then
     echo "------------ Finished bundling for macOS ------------"
 fi
 
-if [[ $@ == *"dist-linux"* ]]; then
-    echo "------------ Bundling for Linux ------------"
+if [[ $@ == *"dist-linuxgnu"* ]]; then
+    echo "------------ Bundling for Linux (GNU) ------------"
 
     java -jar bundler.jar bundle \
         --arch aarch64 --os gnulinux \

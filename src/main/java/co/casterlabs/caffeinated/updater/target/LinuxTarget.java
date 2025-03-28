@@ -23,7 +23,7 @@ class LinuxTarget implements Target {
 
     @SneakyThrows
     @Override
-    public boolean supported() {
+    public boolean isSupported() {
         return Arrays.asList(OSDistribution.LINUX).contains(Platform.osDistribution) &&
             Arrays.asList("aarch64", "arm", "ppc64le", "x86_64").contains(Platform.archTarget) &&
             LinuxLibC.isGNU();

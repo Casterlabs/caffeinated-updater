@@ -11,7 +11,7 @@ public interface Target {
 
     public void forceKillApp() throws IOException, InterruptedException;
 
-    public boolean supported();
+    public boolean isSupported();
 
     public String getDownloadName();
 
@@ -27,7 +27,7 @@ public interface Target {
         List<Target> targets = Arrays.asList(new LinuxTarget(), new MacTarget(), new WindowsTarget());
 
         for (Target target : targets) {
-            if (target.supported()) {
+            if (target.isSupported()) {
                 return target;
             }
         }

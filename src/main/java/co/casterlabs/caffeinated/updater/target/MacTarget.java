@@ -21,7 +21,7 @@ class MacTarget implements Target {
     }
 
     @Override
-    public boolean supported() {
+    public boolean isSupported() {
         return Arrays.asList(OSDistribution.MACOS).contains(Platform.osDistribution) &&
             Arrays.asList("aarch64", "x86_64").contains(Platform.archTarget);
     }

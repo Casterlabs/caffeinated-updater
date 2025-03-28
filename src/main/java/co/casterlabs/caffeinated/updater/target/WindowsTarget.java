@@ -22,7 +22,7 @@ class WindowsTarget implements Target {
     }
 
     @Override
-    public boolean supported() {
+    public boolean isSupported() {
         return Arrays.asList(OSDistribution.WINDOWS_NT).contains(Platform.osDistribution) &&
             Arrays.asList("x86_64").contains(Platform.archTarget);
     }

@@ -1,7 +1,13 @@
 package co.casterlabs.caffeinated.updater.window;
 
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URI;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -49,6 +55,17 @@ class UpdaterUI extends JPanel {
         streamerText.setForeground(UpdaterDialog.TEXT_COLOR);
         streamerText.setOpaque(false);
         streamerText.setText("@" + Streamers.getChosenStreamer());
+        streamerText.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        streamerText.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                try {
+                    Desktop.getDesktop().browse(URI.create(Streamers.getChosenStreamerURL()));
+                } catch (IOException ignored) {}
+            }
+        });
+
         this.add(streamerText);
 
         this.loadingSpinner = new LoadingSpinner(animationContext);

@@ -53,10 +53,6 @@ public class Updater {
         return target != null;
     }
 
-    static {
-        appDirectory.mkdirs();
-    }
-
     public static void borkInstall() {
         new File(appDirectory, "current_build_info.json").delete();
     }

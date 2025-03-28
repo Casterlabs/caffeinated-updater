@@ -80,12 +80,8 @@ jobs:
         run: C:\signing\sign.bat dist\Casterlabs-Caffeinated-Setup.exe
 
       - name: 📝 Rename the Windows installer exe
-        shell: cmd
-        run: |
-          setlocal enabledelayedexpansion
-          set "filename=dist\Casterlabs-Caffeinated-Setup.exe"
-          set "newname=dist\Casterlabs-Caffeinated-Setup-${{ matrix.channel }}.exe"
-          ren "!filename!" "!newname!"
+        shell: bash
+        run: mv dist\Casterlabs-Caffeinated-Setup.exe dist\Casterlabs-Caffeinated-Setup-${{ matrix.channel }}.exe
 
       - name: 🆙 Upload the Windows artifact (x86_64)
         uses: actions/upload-artifact@v4

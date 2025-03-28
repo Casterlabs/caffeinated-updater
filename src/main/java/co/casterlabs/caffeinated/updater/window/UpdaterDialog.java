@@ -7,6 +7,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Taskbar;
+import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.RoundRectangle2D;
@@ -48,9 +49,12 @@ public class UpdaterDialog extends JFrame implements Closeable {
 
         this.getContentPane().add(this.pane);
 
+        // Window settings.
         this.setTitle("Caffeinated Updater");
-        this.setAlwaysOnTop(false);
+        this.setType(Window.Type.POPUP);
+        this.setAlwaysOnTop(true);
         this.setUndecorated(true);
+        this.setResizable(false);
 
         // Colors.
         this.setBackground(BACKGROUND_COLOR);
@@ -59,7 +63,6 @@ public class UpdaterDialog extends JFrame implements Closeable {
 
         // Size & Shape.
         this.setSize(WIDTH, HEIGHT);
-        this.setResizable(false);
         this.setShape(new RoundRectangle2D.Double(0, 0, WIDTH, HEIGHT, ARC, ARC));
 
         // Drag listener.

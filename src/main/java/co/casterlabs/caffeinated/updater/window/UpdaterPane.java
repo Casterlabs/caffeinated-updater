@@ -2,52 +2,24 @@ package co.casterlabs.caffeinated.updater.window;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import co.casterlabs.caffeinated.updater.util.FileUtil;
-import co.casterlabs.caffeinated.updater.window.animations.BlankAnimation;
-import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import xyz.e3ndr.fastloggingframework.logging.FastLogger;
+import co.casterlabs.caffeinated.updater.window.animations.AbstractDialogAnimation;
 
-public class UpdaterPane extends JPanel {
+class UpdaterPane extends JPanel {
     private static final long serialVersionUID = -4429924866600191261L;
 
-    private static final String[] STREAMERS = {
-            "stallion",
-            "jcodude",
-            "himichannel",
-            "statice06",
-            "dayoshi",
-            "thebrophersgrimm",
-    };
+    private static final int PROGRESS_SIZE = 5;
 
-    public static String chosenStreamer = STREAMERS[0]; // Default is required for WindowBuilder.
-    private static Image chosenStreamerImage;
+    private AbstractDialogAnimation currentAnimation;
 
-    static {
-        try {
-            chosenStreamer = STREAMERS[(int) Math.floor(Math.random() * STREAMERS.length)];
-            chosenStreamerImage = ImageIO.read(FileUtil.loadResourceAsUrl(String.format("assets/streamers/%s.png", chosenStreamer)));
-            FastLogger.logStatic("Chosen Streamer: %s", chosenStreamer);
-        } catch (Exception e) {
-            FastLogger.logException(e);
-        }
-    }
+    UpdaterUI ui;
+    volatile double progress;
 
-    private @Setter @NonNull DialogAnimation currentAnimation = new BlankAnimation();
-
-    private @Getter UpdaterUI ui;
-
-    public UpdaterPane(UpdaterDialog dialog, DialogAnimation animation) throws IOException {
+    public UpdaterPane(UpdaterDialog dialog, AbstractDialogAnimation animation, AnimationContext animationContext) {
         this.currentAnimation = animation;
 
         SpringLayout layout = new SpringLayout();
@@ -56,16 +28,15 @@ public class UpdaterPane extends JPanel {
         this.setBackground(UpdaterDialog.TRANSPARENT_COLOR);
         this.setOpaque(false);
 
-        this.ui = new UpdaterUI(dialog, animation);
-        layout.putConstraint(SpringLayout.NORTH, ui, 0, SpringLayout.NORTH, this);
-        layout.putConstraint(SpringLayout.WEST, ui, 0, SpringLayout.WEST, this);
-        layout.putConstraint(SpringLayout.SOUTH, ui, 0, SpringLayout.SOUTH, this);
-        layout.putConstraint(SpringLayout.EAST, ui, 0, SpringLayout.EAST, this);
+        this.ui = new UpdaterUI(dialog, animation, animationContext);
+        layout.putConstraint(SpringLayout.NORTH, this.ui, 0, SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.WEST, this.ui, 0, SpringLayout.WEST, this);
+        layout.putConstraint(SpringLayout.SOUTH, this.ui, 0, SpringLayout.SOUTH, this);
+        layout.putConstraint(SpringLayout.EAST, this.ui, 0, SpringLayout.EAST, this);
         this.add(this.ui);
 
-        AnimationContext
-            .getRenderables()
-            .add(this::repaint);
+        animationContext.toTick
+            .add((_unused) -> this.repaint());
     }
 
     @Override
@@ -76,23 +47,29 @@ public class UpdaterPane extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         // Paint the background color
-//        g2d.clearRect(0, 0, WIDTH, HEIGHT);
+//        g2d.clearRect(0, 0, UpdaterDialog.WIDTH, UpdaterDialog.HEIGHT);
         g2d.setBackground(UpdaterDialog.BACKGROUND_COLOR);
-        g2d.fillRect(0, 0, WIDTH, HEIGHT);
+        g2d.fillRect(0, 0, UpdaterDialog.WIDTH, UpdaterDialog.HEIGHT);
 
         // Paint the animation (background)
         this.currentAnimation.paintOnBackground(g2d);
 
         // Paint the background image if set
-        if (chosenStreamerImage != null) {
+        if (Streamers.getChosenStreamerImage() != null) {
             // The image is same size as the window.
-            g2d.drawImage(chosenStreamerImage, 0, 0, null);
+            g2d.drawImage(Streamers.getChosenStreamerImage(), 0, 0, null);
         }
 
         // Paint the animation (over background)
         this.currentAnimation.paintOverBackground(g2d);
 
         super.paint(g2d);
+        if (this.progress > 0) {
+            g2d.setColor(UpdaterDialog.TEXT_COLOR);
+
+            int width = (int) (UpdaterDialog.WIDTH * this.progress);
+            g2d.fillRect(0, UpdaterDialog.HEIGHT - PROGRESS_SIZE, width, PROGRESS_SIZE);
+        }
 
         // Paint the animation (foreground)
         this.currentAnimation.paintOnForeground(g2d);

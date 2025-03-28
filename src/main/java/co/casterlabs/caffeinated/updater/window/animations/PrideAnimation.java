@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
 import lombok.SneakyThrows;
 
-public class PrideAnimation extends DialogAnimation {
+class PrideAnimation extends AbstractDialogAnimation {
     private BufferedImage image;
 
     @SneakyThrows

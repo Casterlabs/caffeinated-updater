@@ -6,16 +6,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
-import co.casterlabs.commons.platform.OSDistribution;
-import co.casterlabs.commons.platform.Platform;
 
 public interface Target {
 
     public void forceKillApp() throws IOException, InterruptedException;
 
-    public OSDistribution supportedOS();
-
-    public List<String> supportedTargets();
+    public boolean supported();
 
     public String getDownloadName();
 
@@ -31,7 +27,7 @@ public interface Target {
         List<Target> targets = Arrays.asList(new LinuxTarget(), new MacTarget(), new WindowsTarget());
 
         for (Target target : targets) {
-            if (target.supportedOS() == Platform.osDistribution && target.supportedTargets().contains(Platform.archTarget)) {
+            if (target.supported()) {
                 return target;
             }
         }

@@ -2,25 +2,23 @@ package co.casterlabs.caffeinated.updater.window;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.io.IOException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
+import co.casterlabs.caffeinated.updater.window.animations.AbstractDialogAnimation;
 import lombok.NonNull;
 
-public class UpdaterUI extends JPanel {
+class UpdaterUI extends JPanel {
     private static final long serialVersionUID = -6590073036152631171L;
 
     public static final Font FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 14);
 
+    private LoadingSpinner loadingSpinner;
     private JLabel statusText;
 
-    private LoadingSpinner loadingSpinner;
-
-    public UpdaterUI(UpdaterDialog dialog, DialogAnimation animation) throws IOException {
+    public UpdaterUI(UpdaterDialog dialog, AbstractDialogAnimation animation, AnimationContext animationContext) {
         SpringLayout layout = new SpringLayout();
 
         this.setBackground(UpdaterDialog.BACKGROUND_COLOR);
@@ -34,14 +32,14 @@ public class UpdaterUI extends JPanel {
             this.setBackground(new Color(0, 0, 0, 0));
         }
 
-        statusText = new JLabel();
-        layout.putConstraint(SpringLayout.SOUTH, statusText, -32, SpringLayout.SOUTH, this);
-        layout.putConstraint(SpringLayout.EAST, statusText, -10, SpringLayout.EAST, this);
-        statusText.setFont(FONT);
-        statusText.setForeground(UpdaterDialog.TEXT_COLOR);
-        statusText.setOpaque(false);
+        this.statusText = new JLabel();
+        layout.putConstraint(SpringLayout.SOUTH, this.statusText, -32, SpringLayout.SOUTH, this);
+        layout.putConstraint(SpringLayout.EAST, this.statusText, -10, SpringLayout.EAST, this);
+        this.statusText.setFont(FONT);
+        this.statusText.setForeground(UpdaterDialog.TEXT_COLOR);
+        this.statusText.setOpaque(false);
         this.setStatus("Checking for updates...");
-        this.add(statusText);
+        this.add(this.statusText);
 
         JLabel streamerText = new JLabel();
         layout.putConstraint(SpringLayout.SOUTH, streamerText, -9, SpringLayout.SOUTH, this);
@@ -50,17 +48,17 @@ public class UpdaterUI extends JPanel {
         streamerText.setHorizontalAlignment(JLabel.RIGHT);
         streamerText.setForeground(UpdaterDialog.TEXT_COLOR);
         streamerText.setOpaque(false);
-        streamerText.setText("@" + UpdaterPane.chosenStreamer);
+        streamerText.setText("@" + Streamers.getChosenStreamer());
         this.add(streamerText);
 
-        loadingSpinner = new LoadingSpinner();
-        layout.putConstraint(SpringLayout.NORTH, statusText, 13, SpringLayout.NORTH, loadingSpinner);
-        layout.putConstraint(SpringLayout.WEST, statusText, 6, SpringLayout.EAST, loadingSpinner);
-        layout.putConstraint(SpringLayout.NORTH, loadingSpinner, 255, SpringLayout.NORTH, this);
-        layout.putConstraint(SpringLayout.SOUTH, loadingSpinner, -19, SpringLayout.SOUTH, this);
-        layout.putConstraint(SpringLayout.WEST, loadingSpinner, 20, SpringLayout.WEST, this);
-        layout.putConstraint(SpringLayout.EAST, loadingSpinner, 70, SpringLayout.WEST, this);
-        this.add(loadingSpinner);
+        this.loadingSpinner = new LoadingSpinner(animationContext);
+        layout.putConstraint(SpringLayout.NORTH, this.statusText, 13, SpringLayout.NORTH, this.loadingSpinner);
+        layout.putConstraint(SpringLayout.WEST, this.statusText, 6, SpringLayout.EAST, this.loadingSpinner);
+        layout.putConstraint(SpringLayout.NORTH, this.loadingSpinner, 255, SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.SOUTH, this.loadingSpinner, -19, SpringLayout.SOUTH, this);
+        layout.putConstraint(SpringLayout.WEST, this.loadingSpinner, 20, SpringLayout.WEST, this);
+        layout.putConstraint(SpringLayout.EAST, this.loadingSpinner, 70, SpringLayout.WEST, this);
+        this.add(this.loadingSpinner);
 
         ImageButton closeButton = new ImageButton("close.png", dialog::close);
         layout.putConstraint(SpringLayout.NORTH, closeButton, 10, SpringLayout.NORTH, this);

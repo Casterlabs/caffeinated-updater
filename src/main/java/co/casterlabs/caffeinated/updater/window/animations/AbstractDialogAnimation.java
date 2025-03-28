@@ -3,10 +3,12 @@ package co.casterlabs.caffeinated.updater.window.animations;
 import java.awt.Graphics2D;
 import java.util.Calendar;
 
+import co.casterlabs.caffeinated.updater.window.AnimationContext;
+
 /**
  * All paints are animation-safe.
  */
-public abstract class DialogAnimation {
+public abstract class AbstractDialogAnimation {
 
     public void paintOnForeground(Graphics2D g2d) {}
 
@@ -23,8 +25,8 @@ public abstract class DialogAnimation {
         return "icon.png";
     }
 
-    public static DialogAnimation getCurrentAnimation() {
-        DialogAnimation animation = new BlankAnimation();
+    public static AbstractDialogAnimation getCurrentAnimation(AnimationContext animationContext) {
+        AbstractDialogAnimation animation = new BlankAnimation();
 
         Calendar calendar = Calendar.getInstance();
         int calendarMonth = calendar.get(Calendar.MONTH);
@@ -37,7 +39,7 @@ public abstract class DialogAnimation {
             boolean isJanuaryTimeframe = (calendarMonth == Calendar.JANUARY) && (calendarDate <= 15);
 
             if (isDecember || isNovemberTimeframe || isJanuaryTimeframe) {
-                animation = new WinterSeasonAnimation();
+                animation = new WinterSeasonAnimation(animationContext);
             }
         }
 
@@ -57,7 +59,7 @@ public abstract class DialogAnimation {
             boolean isTheTenth = calendarDate == 10;
 
             if (isFeburay && isTheTenth) {
-                animation = new KamihinokinaiAnimation();
+                animation = new KamihinokinaiAnimation(animationContext);
             }
         }
 
@@ -67,18 +69,18 @@ public abstract class DialogAnimation {
             boolean isTheFourteenth = calendarDate == 14;
 
             if (isFeburay && isTheFourteenth) {
-                animation = new ValentinesAnimation();
+                animation = new ValentinesAnimation(animationContext);
             }
         }
 
         // Enable the Pride month animation during June.
-        {
-            boolean isJune = calendarMonth == Calendar.JUNE;
-
-            if (isJune) {
-                animation = new PrideAnimation();
-            }
-        }
+//        {
+//            boolean isJune = calendarMonth == Calendar.JUNE;
+//
+//            if (isJune) {
+//                animation = new PrideAnimation();
+//            }
+//        }
 
         return animation;
     }

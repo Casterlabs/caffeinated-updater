@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 import co.casterlabs.caffeinated.updater.util.FileUtil;
 import lombok.SneakyThrows;
 
-public class HalloweenAnimation extends DialogAnimation {
+class HalloweenAnimation extends AbstractDialogAnimation {
     private BufferedImage image;
 
     @SneakyThrows

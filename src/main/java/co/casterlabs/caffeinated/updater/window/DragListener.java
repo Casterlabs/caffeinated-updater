@@ -8,7 +8,7 @@ import java.awt.event.MouseEvent;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class DragListener extends MouseAdapter {
+class DragListener extends MouseAdapter {
     private final Window window;
 
     private Point mouseDownCompCoords = null;

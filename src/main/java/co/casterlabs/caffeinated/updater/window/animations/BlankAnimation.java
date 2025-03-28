@@ -1,6 +1,6 @@
 package co.casterlabs.caffeinated.updater.window.animations;
 
-public class BlankAnimation extends DialogAnimation {
+class BlankAnimation extends AbstractDialogAnimation {
 
     // NO-OP
 

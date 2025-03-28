@@ -3,22 +3,23 @@ package co.casterlabs.caffeinated.updater.window;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import co.casterlabs.caffeinated.updater.util.FileUtil;
+import lombok.SneakyThrows;
 
-public class LoadingSpinner extends JPanel {
+class LoadingSpinner extends JPanel {
     private static final long serialVersionUID = 8420714649640311101L;
 
     private double rotation = 0;
 
     private JLabel label;
 
-    public LoadingSpinner() throws IOException {
+    @SneakyThrows
+    public LoadingSpinner(AnimationContext animationContext) {
         this.label = new JLabel();
 
         // https://icons8.com/preloaders/en/circular
@@ -36,10 +37,9 @@ public class LoadingSpinner extends JPanel {
 
         this.setOpaque(false);
 
-        AnimationContext
-            .getRenderables()
-            .add(() -> {
-                this.rotation += 5;
+        animationContext.toTick
+            .add((deltaTime) -> {
+                this.rotation += 180 /* deg/s */ * deltaTime;
                 this.rotation %= 360;
             });
     }

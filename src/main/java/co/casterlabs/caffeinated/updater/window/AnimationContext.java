@@ -1,67 +1,106 @@
 package co.casterlabs.caffeinated.updater.window;
 
+import java.awt.DisplayMode;
+import java.awt.GraphicsDevice;
+import java.awt.Window;
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.SneakyThrows;
+import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
-public class AnimationContext {
-    private static final int FRAME_RATE = 30;
+public class AnimationContext implements Closeable {
+    private volatile int refreshRate = 30;
+    private volatile double frameInterval;
+    private volatile long frameIntervalFloor;
 
-    private static final double FRAME_INTERVAL = FRAME_RATE / 1000f;
-    private static final long FRAME_INTERVAL_FLOOR = (long) Math.floor(FRAME_RATE);
+    public final List<Animatable> toTick = new ArrayList<>();
 
-    private static @Getter List<Runnable> renderables = new ArrayList<>();
+    public boolean isAnimationFrame = false;
 
-    private static @Getter @Setter boolean isAnimationFrame = false;
-    private static @Setter long lastAnimation = 0;
+    private long lastAnimationMillis = 0;
+    private long lastAnimationNanos = System.nanoTime();
 
-    static {
-        // Java will kill it if it's time to shutdown.
-        Thread t = new Thread(() -> {
-            while (true) {
-                AnimationContext.waitToAnimate();
+    private boolean isClosed = false;
+
+    private void recalculateIntervals() {
+        this.frameInterval = 1000f / this.refreshRate;
+        this.frameIntervalFloor = (long) Math.floor(this.frameInterval);
+    }
+
+    public AnimationContext(Window window) {
+        this.recalculateIntervals();
+
+        Thread refreshRateThread = new Thread(() -> {
+            while (!this.isClosed) {
+                GraphicsDevice gd = window.getGraphicsConfiguration().getDevice();
+                int newRefreshRate = gd.getDisplayMode().getRefreshRate();
+                if (newRefreshRate == DisplayMode.REFRESH_RATE_UNKNOWN) {
+                    newRefreshRate = 30;
+                }
+
+                if (this.refreshRate != newRefreshRate) {
+                    this.refreshRate = newRefreshRate;
+                    FastLogger.logStatic("Refresh rate updated to %dhz", newRefreshRate);
+                    this.recalculateIntervals();
+                }
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ignored) {}
             }
         });
+        refreshRateThread.setName("Animation Thread - Refresh rate");
+        refreshRateThread.setDaemon(true);
+        refreshRateThread.start();
 
-        t.setName("Animation Thread");
-        t.setDaemon(true);
-        t.start();
-    }
-
-    public static double getDelta() {
-        // Get the time between now and lastAnimation, make it a float between 0 and 1.
-        long now = System.currentTimeMillis();
-        long diff = now - lastAnimation;
-
-        if (diff <= 0) {
-            return 1;
-        } else {
-            return diff / FRAME_INTERVAL;
-        }
-    }
-
-    @SneakyThrows
-    private static void waitToAnimate() {
-        Thread.sleep(FRAME_INTERVAL_FLOOR);
-
-        if (!renderables.isEmpty()) {
-            while (getDelta() < 1) {
-                // Waste cpu.
+        Thread animationThread = new Thread(() -> {
+            while (!this.isClosed) {
+                this.waitToAnimate();
             }
+        });
+        animationThread.setName("Animation Thread");
+        animationThread.setDaemon(true);
+        animationThread.start();
+    }
 
+    private void waitToAnimate() {
+        long timeSinceLastFrame = System.currentTimeMillis() - this.lastAnimationMillis;
+        long timeToWait = this.frameIntervalFloor - timeSinceLastFrame;
+        if (timeToWait > 0) {
+            try {
+                Thread.sleep(timeToWait);
+            } catch (InterruptedException ignored) {}
+        }
+
+        if (!this.toTick.isEmpty()) {
             // Animate.
-            isAnimationFrame = true;
+            this.isAnimationFrame = true;
 
-            for (Runnable r : renderables) {
-                r.run();
+            double deltaTime = (System.nanoTime() - this.lastAnimationNanos) / 1_000_000_000d;
+            for (Animatable a : this.toTick.toArray(new Animatable[0])) {
+                a.run(deltaTime);
             }
 
-            lastAnimation = System.currentTimeMillis();
-            isAnimationFrame = false;
+            this.lastAnimationMillis = System.currentTimeMillis();
+            this.lastAnimationNanos = System.nanoTime();
+            this.isAnimationFrame = false;
         }
+    }
+
+    @Override
+    public void close() {
+        this.isClosed = true;
+    }
+
+    @FunctionalInterface
+    public static interface Animatable {
+
+        /**
+         * @param deltaTime the amount of seconds since the last frame.
+         */
+        public void run(double deltaTime);
+
     }
 
 }

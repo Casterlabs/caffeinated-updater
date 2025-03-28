@@ -3,7 +3,6 @@ package co.casterlabs.caffeinated.updater.target;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 import co.casterlabs.caffeinated.updater.Updater;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
@@ -11,7 +10,7 @@ import co.casterlabs.commons.platform.OSDistribution;
 import co.casterlabs.commons.platform.Platform;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 
-public class MacTarget implements Target {
+class MacTarget implements Target {
 
     @Override
     public void forceKillApp() throws IOException, InterruptedException {
@@ -22,13 +21,9 @@ public class MacTarget implements Target {
     }
 
     @Override
-    public OSDistribution supportedOS() {
-        return OSDistribution.MACOS;
-    }
-
-    @Override
-    public List<String> supportedTargets() {
-        return Arrays.asList("aarch64", "x86_64");
+    public boolean supported() {
+        return Arrays.asList(OSDistribution.MACOS).contains(Platform.osDistribution) &&
+            Arrays.asList("aarch64", "x86_64").contains(Platform.archTarget);
     }
 
     @Override

@@ -3,14 +3,15 @@ package co.casterlabs.caffeinated.updater.target;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 import co.casterlabs.caffeinated.updater.Updater;
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
+import co.casterlabs.commons.platform.LinuxLibC;
 import co.casterlabs.commons.platform.OSDistribution;
 import co.casterlabs.commons.platform.Platform;
+import lombok.SneakyThrows;
 
-public class LinuxTarget implements Target {
+class LinuxTarget implements Target {
 
     @Override
     public void forceKillApp() throws IOException, InterruptedException {
@@ -20,14 +21,12 @@ public class LinuxTarget implements Target {
         }).waitFor();
     }
 
+    @SneakyThrows
     @Override
-    public OSDistribution supportedOS() {
-        return OSDistribution.LINUX;
-    }
-
-    @Override
-    public List<String> supportedTargets() {
-        return Arrays.asList("aarch64", "arm", "ppc64le", "x86_64");
+    public boolean supported() {
+        return Arrays.asList(OSDistribution.LINUX).contains(Platform.osDistribution) &&
+            Arrays.asList("aarch64", "arm", "ppc64le", "x86_64").contains(Platform.archTarget) &&
+            LinuxLibC.isGNU();
     }
 
     @Override

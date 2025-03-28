@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -16,15 +15,17 @@ import org.jetbrains.annotations.Nullable;
 
 import co.casterlabs.caffeinated.updater.util.FileUtil;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 
-public class ImageButton extends JPanel implements MouseListener {
+class ImageButton extends JPanel implements MouseListener {
     private static final long serialVersionUID = 8420714649640311101L;
 
     private JLabel label;
 
     private Runnable onClickHandler;
 
-    public ImageButton(@NonNull String asset, @Nullable Runnable onClickHandler) throws IOException {
+    @SneakyThrows
+    public ImageButton(@NonNull String asset, @Nullable Runnable onClickHandler) {
         this.onClickHandler = onClickHandler;
         this.label = new JLabel();
 

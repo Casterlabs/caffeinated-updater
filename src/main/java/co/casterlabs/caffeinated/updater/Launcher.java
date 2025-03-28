@@ -12,8 +12,6 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
-import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
-import lombok.Getter;
 import xyz.e3ndr.fastloggingframework.FastLogHandler;
 import xyz.e3ndr.fastloggingframework.FastLoggingFramework;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
@@ -66,23 +64,30 @@ public class Launcher {
         }
     }
 
-    private static @Getter Thread updaterThread;
     private static UpdaterDialog dialog;
 
-    public static void main(String[] args) throws Exception {
-        updaterThread = Thread.currentThread();
-
-        dialog = new UpdaterDialog(DialogAnimation.getCurrentAnimation());
+    public static void main(String[] args) throws InterruptedException {
+        dialog = new UpdaterDialog();
 
         dialog.setStatus("");
         dialog.setVisible(true);
 
+        if (Updater.target == null) {
+            dialog.setLoading(false);
+            dialog.setStatus("Platform not supported :(");
+            return;
+        }
+
         // Trigger the file watcher(s).
-        File dieFile = new File(Updater.ipcDirectory, "die");
-        dieFile.createNewFile();
-        Thread.sleep(1500);
-        dieFile.delete();
-        Thread.sleep(500);
+        try {
+            File dieFile = new File(Updater.ipcDirectory, "die");
+            dieFile.createNewFile();
+            Thread.sleep(1500);
+            dieFile.delete();
+            Thread.sleep(500);
+        } catch (Throwable t) {
+            FastLogger.logStatic(LogLevel.WARNING, "Could not tell the app to die, this is probably fine.\n%s", t);
+        }
 
         try {
             Updater.target.forceKillApp();
@@ -92,16 +97,14 @@ public class Launcher {
 
         if (System.getProperty("caffeinated.donotupdate", "false").equalsIgnoreCase("true")) {
             dialog.setStatus("Twiddling my thumbs...");
-            try {
-                Thread.sleep(Long.MAX_VALUE);
-            } catch (InterruptedException ignored) {}
+            return;
         }
 
         dialog.setStatus("Checking for updates...");
         checkForUpdates();
     }
 
-    private static void checkForUpdates() throws Exception {
+    private static void checkForUpdates() throws InterruptedException {
         try {
             if (Updater.isLauncherOutOfDate()) {
                 try {
@@ -133,6 +136,7 @@ public class Launcher {
             }
         } catch (Exception e) {
             dialog.setStatus("Launcher update failed, ignoring...");
+            FastLogger.logStatic(LogLevel.WARNING, "Launcher update failed, ignoring...\n%s", e);
             TimeUnit.SECONDS.sleep(5);
             dialog.setStatus("Checking for updates...");
         }
@@ -164,9 +168,7 @@ public class Launcher {
             Updater.launch(dialog);
         } catch (UpdaterException e) {
             dialog.setStatus(e.getMessage());
-
-            FastLogger.logStatic(LogLevel.SEVERE, e.getMessage());
-            FastLogger.logException(e.getCause());
+            FastLogger.logStatic(LogLevel.SEVERE, e);
 
             TimeUnit.SECONDS.sleep(10);
 

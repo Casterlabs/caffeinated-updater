@@ -31,26 +31,22 @@ public class Updater {
     private static final String UPDATER_VERSION_PATH = DIST_PATH_BASE + "/updater-version";
     private static final String CHANNEL_COMMIT_PATH = CHANNEL_PATH_BASE + "/commit";
 
-    public static String appDataDirectory = AppDirsFactory.getInstance().getUserDataDir("casterlabs-caffeinated", null, null, true);
-    public static File appDirectory = new File(appDataDirectory, "app");
-    public static File ipcDirectory = new File(appDataDirectory, "ipc");
+    public static final String appDataDirectory = AppDirsFactory.getInstance().getUserDataDir("casterlabs-caffeinated", null, null, true);
+    public static final File appDirectory = new File(appDataDirectory, "app");
+    public static final File ipcDirectory = new File(appDataDirectory, "ipc");
+
+    public static final Target target = Target.get();
 
     static {
         appDirectory.mkdirs();
         ipcDirectory.mkdirs();
     }
 
-    public static final Target target = Target.get();
-
     public static boolean isLauncherOutOfDate() throws IOException, InterruptedException {
         if (System.getProperty("caffeinated.reinstall", "false").equalsIgnoreCase("true")) return true;
 
         int remoteLauncherVersion = Integer.parseInt(CdnUtil.string(UPDATER_VERSION_PATH).trim());
         return VERSION < remoteLauncherVersion;
-    }
-
-    public static boolean isPlatformSupported() {
-        return target != null;
     }
 
     public static void borkInstall() {
@@ -61,6 +57,8 @@ public class Updater {
      * @return 0 for up-to-date, 1 for needs update, 2 for error
      */
     public static int needsUpdate() {
+        if (System.getProperty("caffeinated.forceupdate", "false").equalsIgnoreCase("true")) return 1;
+
         File buildInfoFile = new File(appDirectory, "current_build_info.json");
 
         // Check for existence of files.
@@ -126,8 +124,6 @@ public class Updater {
                     totalRead += read;
 
                     double progress = totalRead / totalSize;
-
-                    dialog.setStatus(String.format("Downloading updates... (%.0f%%)", progress * 100));
                     dialog.setProgress(progress);
                 }
 

@@ -12,7 +12,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.RoundRectangle2D;
 import java.io.Closeable;
-import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -20,8 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import co.casterlabs.caffeinated.updater.util.FileUtil;
-import co.casterlabs.caffeinated.updater.window.animations.DialogAnimation;
-import lombok.Getter;
+import co.casterlabs.caffeinated.updater.window.animations.AbstractDialogAnimation;
 import xyz.e3ndr.fastloggingframework.logging.FastLogger;
 import xyz.e3ndr.fastloggingframework.logging.LogLevel;
 
@@ -36,21 +34,23 @@ public class UpdaterDialog extends JFrame implements Closeable {
     public static final Color BACKGROUND_COLOR = new Color(18, 18, 18); // #121212
     public static final Color TEXT_COLOR = new Color(181, 181, 181); // #b5b5b5
 
-    private @Getter UpdaterPane pane;
-    private @Getter UpdaterUI ui;
+    private static final String WINDOW_TITLE = "Caffeinated Updater";
+
+    private AnimationContext animationContext = new AnimationContext(this);
+    private UpdaterPane pane;
 
     private int currentProgress = 0;
 
-    public UpdaterDialog(DialogAnimation animation) throws IOException {
+    public UpdaterDialog() {
 //        super((Window) null);
 
-        this.pane = new UpdaterPane(this, animation);
-        this.ui = this.pane.getUi();
+        AbstractDialogAnimation animation = AbstractDialogAnimation.getCurrentAnimation(this.animationContext);
+        this.pane = new UpdaterPane(this, animation, this.animationContext);
 
         this.getContentPane().add(this.pane);
 
         // Window settings.
-        this.setTitle("Caffeinated Updater");
+        this.setTitle(WINDOW_TITLE);
         this.setType(Window.Type.POPUP);
         this.setAlwaysOnTop(true);
         this.setUndecorated(true);
@@ -142,34 +142,46 @@ public class UpdaterDialog extends JFrame implements Closeable {
     }
 
     public void setStatus(String status) {
-        this.ui.setStatus(status);
+        this.pane.ui.setStatus(status);
     }
 
     public void setProgress(double progress) {
-        if (!Taskbar.isTaskbarSupported()) return;
-
-        Taskbar taskbar = Taskbar.getTaskbar();
-        if (!taskbar.isSupported(Taskbar.Feature.PROGRESS_STATE_WINDOW)) return;
-
         if (progress < 0) {
-            this.currentProgress = 0;
-            taskbar.setWindowProgressValue(this, -1);
-            taskbar.setWindowProgressState(this, Taskbar.State.OFF);
+            this.currentProgress = -1;
+            this.pane.progress = -1;
         } else {
             int percent = (int) Math.round(progress * 100); // 0-1 -> 0-100
+            this.pane.progress = progress;
 
             if (this.currentProgress == percent) {
+                // Optimization to avoid calling setWindowProgressValue unnecessarily.
                 return;
             }
 
             this.currentProgress = percent;
-            taskbar.setWindowProgressState(this, Taskbar.State.NORMAL);
-            taskbar.setWindowProgressValue(this, percent);
+        }
+
+        try {
+            Taskbar taskbar = Taskbar.getTaskbar();
+
+            if (this.currentProgress < 0) {
+                taskbar.setWindowProgressValue(this, -1);
+                taskbar.setWindowProgressState(this, Taskbar.State.OFF);
+            } else {
+                taskbar.setWindowProgressState(this, Taskbar.State.NORMAL);
+                taskbar.setWindowProgressValue(this, this.currentProgress);
+            }
+        } catch (UnsupportedOperationException e) {
+            if (this.currentProgress < 0) {
+                this.setTitle(WINDOW_TITLE);
+            } else {
+                this.setTitle(String.format("%s (%d%%)", WINDOW_TITLE, this.currentProgress));
+            }
         }
     }
 
     public void setLoading(boolean loading) {
-        this.ui.setLoading(loading);
+        this.pane.ui.setLoading(loading);
     }
 
 }

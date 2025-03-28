@@ -8,6 +8,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import co.casterlabs.caffeinated.updater.window.UpdaterDialog;
@@ -107,17 +108,27 @@ public class Launcher {
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException ignored) {}
 
-                try {
-                    Updater.target.updateUpdater(dialog);
-                } catch (Exception e) {
-                    FastLogger.logException(e);
+                dialog.setLoading(false);
+                dialog.setStatus("Your launcher is out of date! (Download from casterlabs.co)");
 
-                    // TODO display this message better and give a button to download.
-                    dialog.setLoading(false);
-                    dialog.setStatus("Your launcher is out of date! (Download from casterlabs.co)");
+                int option = JOptionPane.showConfirmDialog(
+                    dialog,
+                    "The launcher is out of date, do you want to open the Casterlabs website to download the latest version?\n"
+                        + "You will need to reinstall the app, this will not delete your settings.",
+                    "Launcher out of date",
+                    JOptionPane.YES_NO_OPTION
+                );
 
-                    Desktop.getDesktop().browse(URI.create("https://casterlabs.co"));
+                if (option == JOptionPane.YES_OPTION) {
+                    try {
+                        Desktop.getDesktop().browse(URI.create("https://casterlabs.co"));
+                    } catch (Exception e) {
+                        dialog.setStatus("An error occurred. Please redownload from casterlabs.co.");
+                        return;
+                    }
                 }
+
+                System.exit(0);
                 return;
             }
         } catch (Exception e) {

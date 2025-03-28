@@ -41,11 +41,6 @@ public class LinuxTarget implements Target {
     }
 
     @Override
-    public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public File getUpdaterLaunchFile() {
         return new File("./Casterlabs-Caffeinated");
     }

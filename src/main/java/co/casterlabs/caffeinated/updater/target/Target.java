@@ -21,8 +21,6 @@ public interface Target {
 
     public String getLaunchCommand();
 
-    public void updateUpdater(UpdaterDialog dialog) throws IOException, InterruptedException;
-
     public File getUpdaterLaunchFile();
 
     public void finalizeUpdate(UpdaterDialog dialog, File appDirectory) throws InterruptedException, IOException;

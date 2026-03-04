@@ -17,10 +17,6 @@ public abstract class AbstractDialogAnimation {
 
     public void paintOnBackground(Graphics2D g2d) {}
 
-    public boolean shouldShowCasterlabsBanner() {
-        return true;
-    }
-
     public String getIcon() {
         return "icon.png";
     }
@@ -72,15 +68,6 @@ public abstract class AbstractDialogAnimation {
                 animation = new ValentinesAnimation(animationContext);
             }
         }
-
-        // Enable the Pride month animation during June.
-//        {
-//            boolean isJune = calendarMonth == Calendar.JUNE;
-//
-//            if (isJune) {
-//                animation = new PrideAnimation();
-//            }
-//        }
 
         return animation;
     }

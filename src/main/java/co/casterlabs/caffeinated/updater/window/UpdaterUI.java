@@ -84,14 +84,12 @@ class UpdaterUI extends JPanel {
         layout.putConstraint(SpringLayout.EAST, closeButton, -10, SpringLayout.EAST, this);
         this.add(closeButton);
 
-        if (animation.shouldShowCasterlabsBanner()) {
-            ImageButton casterlabsBanner = new ImageButton("banner_white.png", null);
-            layout.putConstraint(SpringLayout.NORTH, casterlabsBanner, 10, SpringLayout.NORTH, this);
-            layout.putConstraint(SpringLayout.WEST, casterlabsBanner, 10, SpringLayout.WEST, this);
-            layout.putConstraint(SpringLayout.SOUTH, casterlabsBanner, 93, SpringLayout.NORTH, this);
-            layout.putConstraint(SpringLayout.EAST, casterlabsBanner, 265, SpringLayout.WEST, this);
-            this.add(casterlabsBanner);
-        }
+        ImageButton casterlabsBanner = new ImageButton("banner_white.png", null);
+        layout.putConstraint(SpringLayout.NORTH, casterlabsBanner, 10, SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.WEST, casterlabsBanner, 10, SpringLayout.WEST, this);
+        layout.putConstraint(SpringLayout.SOUTH, casterlabsBanner, 93, SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.EAST, casterlabsBanner, 265, SpringLayout.WEST, this);
+        this.add(casterlabsBanner);
 
     }
 

@@ -70,6 +70,20 @@ jobs:
         shell: bash
         run: CHANNEL=${{ matrix.channel }} ./build.sh dist-windows
 
+      - name: ✍️ Sign the Windows exe
+        uses: azure/artifact-signing-action@v1
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: https://eus.codesigning.azure.net/
+          signing-account-name: ${{ secrets.SIGNING_ACCOUNT_NAME }}
+          certificate-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          files: ${{ github.workspace }}\dist\build\windows-x86_64\Casterlabs-Caffeinated.exe
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
       - name: 🔨 Create Windows installer
         uses: joncloud/makensis-action@v4.1
         with:

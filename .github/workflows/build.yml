@@ -65,6 +65,13 @@ jobs:
           java-version: 11
           distribution: temurin
           cache: maven
+      
+      # https://github.com/joncloud/makensis-action/issues/39#issuecomment-3326855623
+      # https://github.com/repolevedavaj/install-nsis
+      - name: 🏗️ Set up NSIS
+        uses: repolevedavaj/install-nsis@v1.0.1
+        with:
+          nsis-version: '3.11'
 
       - name: 📦 Build the Windows artifact
         shell: bash
@@ -85,7 +92,7 @@ jobs:
           timestamp-digest: SHA256
 
       - name: 🔨 Create Windows installer
-        uses: joncloud/makensis-action@v4.1
+        uses: joncloud/makensis-action@v5.0
         with:
           script-file: "Installer.nsi"
 

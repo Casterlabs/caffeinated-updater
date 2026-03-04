@@ -41,7 +41,7 @@ jobs:
   build_windows:
     name: Build Windows
     needs: [build_app]
-    runs-on: windows-latest
+    runs-on: windows-2022 # https://github.com/joncloud/makensis-action/issues/39#issuecomment-3326855623
     strategy:
       fail-fast: false
       matrix:
@@ -65,16 +65,6 @@ jobs:
           java-version: 11
           distribution: temurin
           cache: maven
-      
-      # https://github.com/joncloud/makensis-action/issues/39#issuecomment-3326855623
-      # https://github.com/NSIS-Dev/ci-examples/blob/main/.github/workflows/windows-latest.yml
-      - name: 🏗️ Set up NSIS
-        run: |
-          iwr -useb get.scoop.sh -outfile 'install.ps1'
-          .\install.ps1 -RunAsAdmin
-          scoop update
-          scoop bucket add extras
-          scoop install nsis
 
       - name: 📦 Build the Windows artifact
         shell: bash

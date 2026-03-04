@@ -67,11 +67,14 @@ jobs:
           cache: maven
       
       # https://github.com/joncloud/makensis-action/issues/39#issuecomment-3326855623
-      # https://github.com/repolevedavaj/install-nsis
+      # https://github.com/NSIS-Dev/ci-examples/blob/main/.github/workflows/windows-latest.yml
       - name: 🏗️ Set up NSIS
-        uses: repolevedavaj/install-nsis@v1.0.1
-        with:
-          nsis-version: '3.11'
+        run: |
+          iwr -useb get.scoop.sh -outfile 'install.ps1'
+          .\install.ps1 -RunAsAdmin
+          scoop update
+          scoop bucket add extras
+          scoop install nsis
 
       - name: 📦 Build the Windows artifact
         shell: bash

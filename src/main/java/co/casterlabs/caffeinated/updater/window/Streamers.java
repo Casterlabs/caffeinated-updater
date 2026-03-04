@@ -17,7 +17,7 @@ class Streamers {
 
     // @formatter:off
     private static final Map<String, String> STREAMERS = Map.of(
-        "BrophersGrimm", "https://twitch.tv/thebrophersgrimm",
+        "Brophers", "https://twitch.tv/brophers",
         "Dayoshi",       "https://twitch.tv/dayoshi",
         "SammySnow",     "https://beacons.ai/sammysnow",
         "Stallion",      "https://linktr.ee/imstallion",

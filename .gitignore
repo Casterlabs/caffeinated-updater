@@ -10,5 +10,6 @@
 
 # Common
 /target/
+.factorypath
 dist/
 *_runtime.*

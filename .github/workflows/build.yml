@@ -41,7 +41,7 @@ jobs:
   build_windows:
     name: Build Windows
     needs: [build_app]
-    runs-on: [self-hosted, Windows, x64, code-sign]
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
@@ -76,8 +76,18 @@ jobs:
           script-file: "Installer.nsi"
 
       - name: ✍️ Sign the Windows installer
-        shell: cmd
-        run: C:\signing\sign.bat dist\Casterlabs-Caffeinated-Setup.exe
+        uses: azure/artifact-signing-action@v1
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: https://eus.codesigning.azure.net/
+          signing-account-name: ${{ secrets.SIGNING_ACCOUNT_NAME }}
+          certificate-profile-name: ${{ secrets.SIGNING_PROFILE_NAME }}
+          files: ${{ github.workspace }}\dist\Casterlabs-Caffeinated-Setup.exe
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
 
       - name: 📝 Rename the Windows installer exe
         shell: bash

@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import co.casterlabs.caffeinated.updater.Updater;
 import co.casterlabs.caffeinated.updater.window.animations.AbstractDialogAnimation;
 import lombok.NonNull;
 
@@ -91,6 +92,15 @@ class UpdaterUI extends JPanel {
         layout.putConstraint(SpringLayout.EAST, casterlabsBanner, 265, SpringLayout.WEST, this);
         this.add(casterlabsBanner);
 
+        if (!Updater.CHANNEL.equals("stable")) {
+            JLabel channelLabel = new JLabel(Updater.CHANNEL);
+            layout.putConstraint(SpringLayout.NORTH, channelLabel, 53, SpringLayout.NORTH, this);
+            layout.putConstraint(SpringLayout.WEST, channelLabel, 260, SpringLayout.WEST, this);
+            channelLabel.setFont(FONT);
+            channelLabel.setForeground(UpdaterDialog.TEXT_COLOR);
+            channelLabel.setOpaque(false);
+            this.add(channelLabel);
+        }
     }
 
     public void setLoading(boolean loading) {

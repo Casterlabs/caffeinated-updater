@@ -1,4 +1,6 @@
 !include "MUI2.nsh"
+!include "nsDialogs.nsh"
+!include "LogicLib.nsh"
 
 ;--------------------------------
 ; General
@@ -39,10 +41,12 @@ RequestExecutionLevel admin
 
 ; Uninstaller pages
 !define MUI_PAGE_CUSTOMFUNCTION_SHOW un.ModifyUnWelcome
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE un.LeaveUnWelcome
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_INSTFILES
   
-; Var deleteUserData ; You could just store the HWND in $1 etc if you don't want this extra variable
+Var deleteUserData
+Var deleteUserDataCheckbox
 
 ;--------------------------------
 ; Section - Installer
@@ -87,10 +91,14 @@ SectionEnd
 ; Section - Uninstaller
 
 Function un.ModifyUnWelcome
-  ;${NSD_CreateCheckbox} 120u -20u 50% 20u $(DESC_DeleteUserData)
-  ;Pop $deleteUserData
-  ;SetCtlColors $deleteUserData "" ${MUI_BGCOLOR}
-  ;${NSD_Check} $deleteUserData ; Unchecked by default
+  ${NSD_CreateCheckbox} 120u -20u 50% 20u $(DESC_DeleteUserData)
+  Pop $deleteUserDataCheckbox
+  SetCtlColors $deleteUserDataCheckbox "" ${MUI_BGCOLOR}
+  ; Unchecked by default
+FunctionEnd
+
+Function un.LeaveUnWelcome
+  ${NSD_GetState} $deleteUserDataCheckbox $deleteUserData
 FunctionEnd
 
 Function un.RMDirUP
@@ -118,13 +126,12 @@ FunctionEnd
 Section "Uninstall"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANY} ${NAME}"
 
-  ;${NSD_GetState} $deleteUserData $0
-  ;${If} $0 <> 0
-  ;  RMDir /r "$APPDATA\casterlabs-caffeinated\preferences" ; Preferences
-  ;  ${RMDirUP} "$APPDATA\casterlabs-caffeinated\preferences"
-  ;  RMDir /r "$APPDATA\casterlabs-caffeinated\plugins" ; Plugins
-  ;  ${RMDirUP} "$APPDATA\casterlabs-caffeinated\plugins"
-  ;${EndIf}
+  ${If} $deleteUserData == ${BST_CHECKED}
+    RMDir /r "$APPDATA\casterlabs-caffeinated\preferences" ; Preferences
+    ${RMDirUP} "$APPDATA\casterlabs-caffeinated\preferences"
+    RMDir /r "$APPDATA\casterlabs-caffeinated\plugins" ; Plugins
+    ${RMDirUP} "$APPDATA\casterlabs-caffeinated\plugins"
+  ${EndIf}
   
   RMDir /r "$APPDATA\casterlabs-caffeinated\app" ; App
   RMDir /r "$APPDATA\casterlabs-caffeinated\ipc" ; IPC

@@ -48,7 +48,6 @@ jobs:
         channel:
           - stable
           - beta
-          - legacy
     steps:
       - name: 📩 Grab the code
         uses: actions/checkout@v4
@@ -69,6 +68,23 @@ jobs:
       - name: 📦 Build the Windows artifact
         shell: bash
         run: CHANNEL=${{ matrix.channel }} ./build.sh dist-windows
+
+      - name: ⚙️ Apply app manifest.
+        shell: pwsh
+        run: |
+            $exe = "${{ github.workspace }}\dist\build\windows-x86_64\Casterlabs-Caffeinated-Updater.exe"
+            $manifest = "${{ github.workspace }}\app.manifest"
+
+            $mt = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\mt.exe" |
+              Sort-Object FullName -Descending |
+              Select-Object -First 1
+
+            if ($null -eq $mt) {
+              throw "Could not find mt.exe"
+            }
+
+            Write-Host "Using mt.exe: $($mt.FullName)"
+            & $mt.FullName -manifest $manifest "-outputresource:$exe;#1"
 
       - name: ✍️ Sign the Windows exe
         uses: azure/artifact-signing-action@v1
